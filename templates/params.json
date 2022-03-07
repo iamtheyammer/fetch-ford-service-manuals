@@ -1,0 +1,26 @@
+{
+  "workshop": {
+    "vechicleId": "123",
+    "modelYear": "0000",
+    "channel": "9",
+    "book": "S0X",
+    "bookTitle": "0000 CarType",
+    "WiringBookCode": "E0B",
+    "WiringBookTitle": "0000 CarType",
+
+    "booktype": "gsi",
+    "country": "USA",
+    "language": "EN-US",
+    "contentmarket": "US",
+    "contentlanguage": "EN",
+    "languageOdysseyCode": "ENUSA",
+    "searchNumber": "0",
+    "Vid": "CZF",
+    "byvin": "NO",
+    "marketGroup": "NA"
+  },
+  "wiring": {
+    "environment": "prod_1_3_362022",
+    "bookType": "basic"
+  }
+}
