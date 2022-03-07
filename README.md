@@ -11,6 +11,7 @@ These manuals are copyrighted by Ford, so don't share them!
 
 - [Usage](#Usage)
 - [Results (what do I get out of this?)](#results)
+- [FAQ](#faq)
 
 ## Usage
 
