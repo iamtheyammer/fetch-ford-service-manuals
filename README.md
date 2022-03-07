@@ -19,7 +19,7 @@ Getting this to work currently requires some knowledge of browser DevTools.
 If you're not sure how to use them, ask a friend who does.
 
 Also, I **highly** recommend using macOS or another POSIX operating system (tested and working on both macOS and Ubuntu on WSL2).
-This library uses [`playwright`](https://github.com/microsoft/playwright), a headless browser interop library, to save documents
+This script uses [`playwright`](https://github.com/microsoft/playwright), a headless browser interop library, to save documents
 as PDF files rather than raw HTML (this way files include images), and Playwright often works better on POSIX systems.
 
 ### Set up Node (>16.3) and Yarn
@@ -35,7 +35,7 @@ as PDF files rather than raw HTML (this way files include images), and Playwrigh
 
 ### Get data for your car
 
-This library requires some data about your car that's not available in the PTS GUI in order to fetch the correct manual.
+This script requires some data about your car that's not available in the PTS GUI in order to fetch the correct manual.
 
 1. If you haven't, purchase a PTS subscription from [here](https://www.motorcraftservice.com/Purchase/ViewProduct). The 72 hour subscription is fine.
 2. Once purchased, go to PTS: click [here](https://www.motorcraftservice.com/MySubscriptions), then click on your subscription title. ![how to open PTS](img/open-pts.png).

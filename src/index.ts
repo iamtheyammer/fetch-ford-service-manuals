@@ -1,4 +1,4 @@
-import { writeFile, mkdir } from "fs/promises";
+import { writeFile, readFile, mkdir } from "fs/promises";
 import fetchTreeAndCover, {
   FetchTreeAndCoverParams,
 } from "./fetchTreeAndCover";
@@ -59,7 +59,8 @@ async function run({configPath, outputPath, cookieString}: CLIArgs) {
 
   console.log("Saving wiring manual...");
 
-  const transformedCookieString = transformCookieString(cookieString);
+  const cookieStringData = await readFile(cookieString, {"encoding": "utf-8"});
+  const transformedCookieString = transformCookieString(cookieStringData);
 
   const wiringContext = await browser.newContext({
     ...pageParams,
@@ -88,14 +89,14 @@ async function run({configPath, outputPath, cookieString}: CLIArgs) {
     contentmarket: config.workshop.contentmarket,
   };
 
-  const wiringToC = await fetchTableOfContents(wiringParams, cookieString);
+  const wiringToC = await fetchTableOfContents(wiringParams, cookieStringData);
 
   await saveEntireWiring(
     outputPath,
     config.workshop,
     wiringParams,
     wiringToC,
-    cookieString,
+    cookieStringData,
     wiringPage
   );
 
