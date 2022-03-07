@@ -5,10 +5,10 @@
     "channel": "9",
     "book": "S0X",
     "bookTitle": "0000 CarType",
-    "WiringBookCode": "E0B",
+    "WiringBookCode": "E0X",
     "WiringBookTitle": "0000 CarType",
+    "booktype": "ody",
 
-    "booktype": "gsi",
     "country": "USA",
     "language": "EN-US",
     "contentmarket": "US",
@@ -20,7 +20,7 @@
     "marketGroup": "NA"
   },
   "wiring": {
-    "environment": "prod_1_3_362022",
-    "bookType": "basic"
+    "environment": "prod_1_3_372022",
+    "bookType": "svg"
   }
 }

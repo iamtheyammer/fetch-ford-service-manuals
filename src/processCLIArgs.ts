@@ -72,7 +72,7 @@ export default function processCLIArgs(): CLIArgs {
 
     if(!options.configFile || !options.outputPath || !options.cookieString) {
       console.error("Missing required args!");
-      console.log(options);
+      // console.log(options);
       
       console.log(usage);
       process.exit(1);

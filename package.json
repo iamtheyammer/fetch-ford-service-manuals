@@ -24,6 +24,7 @@
   },
   "scripts": {
     "start": "ts-node src/index.ts",
-    "format": "prettier --write src/**/*.ts"
+    "format": "prettier --write src/**/*.ts",
+    "playwright-setup": "playwright install chromium && playwright install-deps chromium"
   }
 }
