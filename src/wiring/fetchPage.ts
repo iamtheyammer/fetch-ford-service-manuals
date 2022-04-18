@@ -11,7 +11,6 @@ export interface FetchWiringPageParams {
   language: string;
   title: string;
   market: string;
-  // booktitle: string;
 }
 
 export default async function fetchPage(
@@ -22,8 +21,6 @@ export default async function fetchPage(
   const url = `https://www.fordtechservice.dealerconnection.com/Wiring/Page?${stringify(
     params
   )}`;
-  console.log(url);
-
   await browserPage.goto(url, {
     waitUntil: "networkidle",
   });

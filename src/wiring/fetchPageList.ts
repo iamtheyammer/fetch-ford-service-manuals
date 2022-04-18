@@ -7,7 +7,6 @@ export interface FetchWiringPageList {
   bookType: string;
   contentmarket: string;
   contentlanguage: string;
-
 }
 
 
@@ -21,7 +20,6 @@ export default async function fetchPageList(
     params: {
       ...params,
       fromPageBase: "https://www.fordtechservice.dealerconnection.com",
-      page: 1
     },
     headers: {
       Cookie: cookieString,

@@ -5,7 +5,6 @@ export interface FetchConnectorList {
   bookType: string;
   contentmarket: string;
   contentlanguage: string;
-
 }
 
 export interface ConnectorTableOfContents {
@@ -26,7 +25,6 @@ export default async function fetchConnectorList(
     params: {
       ...params,
       fromPageBase: "https://www.fordtechservice.dealerconnection.com",
-      page: 1
     },
     headers: {
       Cookie: cookieString,

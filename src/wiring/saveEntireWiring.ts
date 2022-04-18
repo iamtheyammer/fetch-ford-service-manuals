@@ -29,9 +29,9 @@ export default async function saveEntireWiring(
       throw e;
     }
   }
-  const connecterPath = join(path, "Connectors");
+  const connectorPath = join(path, "Connectors");
   try {
-    await mkdir(connecterPath);
+    await mkdir(connectorPath);
   } catch (e: any) {
     if (e.code !== "EEXIST") {
       throw e;
@@ -42,9 +42,8 @@ export default async function saveEntireWiring(
     const doc = toc[i];
     const sanitizedTitle = doc.Title.replace(/\//g, "-");
 
-    // 150 = Connector views, different format handled later
-    // Always 150?
-    if (doc.Type === "Page" && doc.Number !== "150") {
+    // Connector views, different format handled later
+    if (doc.Type === "Page" && doc.Title !== "Connector Views") {
       // Need pageList per docNumber
       const pageList = await fetchPageList(
         {
@@ -85,7 +84,7 @@ export default async function saveEntireWiring(
     }
   
     // Start connectors
-    if (doc.Number === "150") {
+    if (doc.Title === "Connector Views") {
       const connectorList = await fetchConnectorList(
         {
           book: fetchWiringParams.book,
@@ -98,7 +97,7 @@ export default async function saveEntireWiring(
 
       for (let k = 0; k < connectorList.length; k++){
         const connector = connectorList[k];
-        const connectorTitle = join(connecterPath, `${connector.Name}.png`);
+        const connectorTitle = join(connectorPath, `${connector.Name}.png`);
         console.log(
           `Downloading Connector Face diagram Section: ${connector.Name} as image. `
         );
