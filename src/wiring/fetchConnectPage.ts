@@ -1,24 +1,21 @@
 import { Page } from "playwright";
 import { stringify } from "qs";
 
-export interface FetchWiringPageParams {
+export interface FetchConnectorParams {
   book: string;
   vehicleId: string;
-  cell: string;
-  page: string;
   country: string;
   bookType: string;
   language: string;
-  title: string;
-  market: string;
+  item: string;
 }
 
-export default async function fetchPage(
-  params: FetchWiringPageParams,
+export default async function fetchConnectorPage(
+  params: FetchConnectorParams,
   browserPage: Page,
   saveImagePath: string
 ): Promise<void> {
-  const url = `https://www.fordtechservice.dealerconnection.com/Wiring/Page?${stringify(
+  const url = `https://www.fordtechservice.dealerconnection.com/Wiring/face/?${stringify(
     params
   )}`;
   await browserPage.goto(url, {
