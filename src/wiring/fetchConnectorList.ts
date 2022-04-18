@@ -17,7 +17,7 @@ export interface ConnectorTableOfContents {
 
 export default async function fetchConnectorList(
   params: FetchConnectorList,
-  cookieString: string,
+  cookieString: string
 ): Promise<ConnectorTableOfContents[]> {
   const req = await client({
     method: "GET",

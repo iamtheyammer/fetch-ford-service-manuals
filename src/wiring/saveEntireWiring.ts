@@ -56,16 +56,19 @@ export default async function saveEntireWiring(
         },
         cookieString
       );
-      
+
       // Fetch each page per Wiring section
-      for (let j = 0; j < pageList.length; j++){
-        const page = pageList[j].replace(/^0+/, '');
-        const newTitle = join(wiringPath, `${doc.Number}_${sanitizedTitle}_${page}.png`);
+      for (let j = 0; j < pageList.length; j++) {
+        const page = pageList[j].replace(/^0+/, "");
+        const newTitle = join(
+          wiringPath,
+          `${doc.Number}_${sanitizedTitle}_${page}.png`
+        );
         console.log(
           `Downloading wiring diagram Section: ${doc.Number} Title: ${doc.Title} Page: ${page} as image. `
         );
         await fetchPage(
-          { 
+          {
             book: fetchWiringParams.book,
             market: fetchWiringParams.contentmarket,
             language: fetchManualParams.contentlanguage,
@@ -82,7 +85,7 @@ export default async function saveEntireWiring(
         continue;
       }
     }
-  
+
     // Start connectors
     if (doc.Title === "Connector Views") {
       const connectorList = await fetchConnectorList(
@@ -93,9 +96,9 @@ export default async function saveEntireWiring(
           contentlanguage: fetchManualParams.contentlanguage,
         },
         cookieString
-      ); 
+      );
 
-      for (let k = 0; k < connectorList.length; k++){
+      for (let k = 0; k < connectorList.length; k++) {
         const connector = connectorList[k];
         const connectorTitle = join(connectorPath, `${connector.Name}.png`);
         console.log(

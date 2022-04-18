@@ -9,10 +9,9 @@ export interface FetchWiringPageList {
   contentlanguage: string;
 }
 
-
 export default async function fetchPageList(
   params: FetchWiringPageList,
-  cookieString: string,
+  cookieString: string
 ): Promise<string> {
   const req = await client({
     method: "GET",
