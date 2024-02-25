@@ -15,58 +15,64 @@ export default async function saveEntireManual(
   const exploded = Object.entries(toc);
 
   for (let i = 0; i < exploded.length; i++) {
-    const [name, value] = exploded[i];
+    const [name, docID] = exploded[i];
 
-    if (typeof value === "string") {
-      // ensure folder exists
-      // try {
-      //   await access(path)
-      // } catch {
-      //   await mkdir(path, {recursive: true})
-      // }
-
+    if (typeof docID === "string") {
       // download and save document
-      if (value.startsWith("http") && value.includes(".pdf")) {
-        console.log(`Downloading manual PDF ${name} ${value}`);
+      if (docID.startsWith("http") && docID.includes(".pdf")) {
+        console.log(`Downloading manual PDF ${name} ${docID}`);
 
         try {
-          const url = new URL(value);
+          const url = new URL(docID);
           const pdfReq = await client({
-            url: value,
+            url: docID,
             responseType: "stream",
           });
 
           const filePath = join(
             path,
-            `/${value.slice(value.lastIndexOf("/"))}`
+            `/${docID.slice(docID.lastIndexOf("/"))}`
           );
           await saveStream(pdfReq.data, filePath);
         } catch (e) {
-          console.error(`Error saving file ${name} with url ${value}: ${e}`);
+          console.error(`Error saving file ${name} with url ${docID}: ${e}`);
         }
         continue;
-      } else if (value.includes("/")) {
-        console.error(`Skipping relative path ${value} for name ${name}`);
+      } else if (docID.includes("/")) {
+        console.error(`Skipping relative path ${docID} for name ${name}`);
         continue;
       }
 
-      console.log(`Downloading manual page ${name}.html (docID: ${value})`);
+      console.log(`Downloading manual page ${name}.html (docID: ${docID})`);
       const sanitizedName = name.replace(/\//g, "-");
+      let filename = sanitizedName;
+
+      // 255 is the max filename length on most filesystems
+      if (sanitizedName.length > 255) {
+        filename =
+          // 255 = max filename length, 12 = length of " ( truncated)", docID.length = length of docID
+          // including the docID in the filename to prevent collisions as names may differ
+          // at the end rather than in the first ~255 characters
+          sanitizedName.slice(0, 255 - 13 - docID.length) +
+          ` (${docID} truncated)`;
+
+        console.log(`-> Truncating filename, learn more in the README`);
+      }
+
       const pageHTML = await fetchManualPage({
         ...fetchPageParams,
-        searchNumber: value,
+        searchNumber: docID,
       });
 
-      const htmlPath = resolve(join(path, `/${sanitizedName}.html`));
+      const htmlPath = resolve(join(path, `/${filename}.html`));
+
       await writeFile(htmlPath, pageHTML);
 
       await savePageAsPDF(
         htmlPath,
-        join(path, `/${sanitizedName}.pdf`),
+        join(path, `/${filename}.pdf`),
         browserPage
       );
-
-      // await sleep(250);
     } else {
       // create folder and traverse
       const newPath = join(path, name);
@@ -81,15 +87,9 @@ export default async function saveEntireManual(
         }
       }
 
-      await saveEntireManual(newPath, value, fetchPageParams, browserPage);
+      await saveEntireManual(newPath, docID, fetchPageParams, browserPage);
     }
   }
-}
-
-function sleep(ms: number) {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
 }
 
 export async function savePageAsPDF(

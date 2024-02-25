@@ -13,14 +13,14 @@ import saveEntireManual from "./saveEntireManual";
 import readConfig from "./readConfig";
 import processCLIArgs, { CLIArgs } from "./processCLIArgs";
 
-async function run({configPath, outputPath, cookieString}: CLIArgs) {
+async function run({ configPath, outputPath, cookieString }: CLIArgs) {
   const config = await readConfig(configPath);
 
   // create output dir
   try {
-    await mkdir(outputPath, {recursive: true})
-  } catch(e:any) {
-    if(e.code !== "EEXIST") {
+    await mkdir(outputPath, { recursive: true });
+  } catch (e: any) {
+    if (e.code !== "EEXIST") {
       console.error(`Error creating output directory ${outputPath}: ${e}`);
       process.exit(1);
     }
@@ -52,14 +52,20 @@ async function run({configPath, outputPath, cookieString}: CLIArgs) {
     join(outputPath, "toc.json"),
     JSON.stringify(tableOfContents, null, 2)
   );
-  await writeFile(join(outputPath, "cover.html"), pageHTML);
+  const coverPath = join(outputPath, "cover");
+  await writeFile(coverPath + ".html", pageHTML);
 
   console.log("Saving manual files...");
-  await saveEntireManual(outputPath, tableOfContents, config.workshop, browserPage);
+  await saveEntireManual(
+    outputPath,
+    tableOfContents,
+    config.workshop,
+    browserPage
+  );
 
   console.log("Saving wiring manual...");
 
-  const cookieStringData = await readFile(cookieString, {"encoding": "utf-8"});
+  const cookieStringData = await readFile(cookieString, { encoding: "utf-8" });
   const transformedCookieString = transformCookieString(cookieStringData);
 
   const wiringContext = await browser.newContext({

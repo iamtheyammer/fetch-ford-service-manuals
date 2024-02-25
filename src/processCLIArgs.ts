@@ -2,7 +2,9 @@ import commandLineArgs from "command-line-args";
 import commandLineUsage from "command-line-usage";
 
 export interface CLIArgs {
- configPath: string; outputPath: string; cookieString: string;
+  configPath: string;
+  outputPath: string;
+  cookieString: string;
 }
 
 export default function processCLIArgs(): CLIArgs {
@@ -45,7 +47,8 @@ export default function processCLIArgs(): CLIArgs {
         {
           name: "cookieString -s",
           typeLabel: "{underline /path/to/cookieString.txt}",
-          description: "{bold Required.} Path to the file that contains your PTS Cookie Header.",
+          description:
+            "{bold Required.} Path to the file that contains your PTS Cookie Header.",
         },
         {
           name: "outputPath -o",
@@ -60,29 +63,29 @@ export default function processCLIArgs(): CLIArgs {
       ],
     },
   ];
-  
+
   const usage = commandLineUsage(sections);
 
   try {
     const options = commandLineArgs(optionConfig);
-    if(options.help) {
+    if (options.help) {
       console.log(usage);
       process.exit(0);
     }
 
-    if(!options.configFile || !options.outputPath || !options.cookieString) {
+    if (!options.configFile || !options.outputPath || !options.cookieString) {
       console.error("Missing required args!");
       // console.log(options);
-      
+
       console.log(usage);
       process.exit(1);
     }
     return {
       configPath: options.configFile,
       outputPath: options.outputPath,
-      cookieString: options.cookieString
+      cookieString: options.cookieString,
     };
-  } catch(e: any) {
+  } catch (e: any) {
     console.error(e);
     console.log(usage);
     process.exit(1);

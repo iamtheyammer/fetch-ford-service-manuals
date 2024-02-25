@@ -26,10 +26,7 @@ export default async function fetchTreeAndCover(
     }),
   });
 
-  return {
-    tableOfContents: processTableOfContents(req.data),
-    pageHTML: req.data,
-  };
+  return processTableOfContents(req.data);
 }
 
 // recursively ignore <i> elements with only a single <i> element inside
@@ -95,13 +92,30 @@ interface TableOfContentsLeaf {
   [documentName: string]: string;
 }
 
-// interface TableOfContentsBranch = TableOfContentsBranch | TableOfContentsLeaf;
-
-function processTableOfContents(toc: string): any {
+function processTableOfContents(toc: string): {
+  tableOfContents: any;
+  pageHTML: string;
+} {
   const { window } = new JSDOM(toc);
   const document = window.document;
 
+  // remove the broken filter links and add a message
+  const imageElement = document.getElementById("imgCollapseTreeDiv");
+  imageElement?.insertAdjacentHTML(
+    "afterend",
+    "<h1><strong>Links below do not work.</strong></h1><p>This table of contents is for reference only. " +
+      "Manual downloaded using <a href='https://github.com/iamtheyammer/fetch-ford-service-manuals'>iamtheyammer's Ford manual downloader.</a> " +
+      "Refer to the README for more information.</p>"
+  );
+  imageElement?.remove();
+
+  // reveal the table of contents
+  document.getElementById("wsm-tree")?.attributes.removeNamedItem("style");
+
   const tree = document.getElementsByClassName("tree")[0];
   const parsed = parseul({}, tree);
-  return parsed;
+  return {
+    tableOfContents: parsed,
+    pageHTML: document.documentElement.outerHTML,
+  };
 }
