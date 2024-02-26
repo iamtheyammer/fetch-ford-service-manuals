@@ -94,7 +94,7 @@ The `toc.json` file contains the computer-readable table of contents, with the n
 
 ### Truncated filenames
 
-Most operating systems limit filenames to 255 bytes (not 255 characters). For filenames over 200 characters (which are farily rare), the downloader will truncate the name, then add ` (docID truncated)` onto the end.
+Most operating systems limit filenames to 255 bytes (not 255 characters). For filenames over 200 characters (which are fairly rare), the downloader will truncate the name, then add ` (docID truncated)` onto the end.
 
 If you're having trouble finding a document with a long name, search for it in `toc.json`, where it will be a key with a value. That value is the `docID` which will be in the filename.
 
