@@ -44,16 +44,19 @@ export default async function saveEntireManual(
       }
 
       console.log(`Downloading manual page ${name}.html (docID: ${docID})`);
-      const sanitizedName = name.replace(/\//g, "-");
+      // remove slashes, emdashes (because they are multi-byte), and colons
+      const sanitizedName = name.replace(/[\/\u2013:]/g, "-");
       let filename = sanitizedName;
 
-      // 255 is the max filename length on most filesystems
-      if (sanitizedName.length > 255) {
+      // 255 is the max filename length on most filesystems, but 200 should be enough regardless
+      if (sanitizedName.length > 200) {
         filename =
-          // 255 = max filename length, 12 = length of " ( truncated)", docID.length = length of docID
+          // 255 = max filename length, 18 = length of " ( truncated).html",
+          // docID.length = length of docID
+
           // including the docID in the filename to prevent collisions as names may differ
           // at the end rather than in the first ~255 characters
-          sanitizedName.slice(0, 255 - 13 - docID.length) +
+          sanitizedName.slice(0, 254 - 19 - docID.length) +
           ` (${docID} truncated)`;
 
         console.log(`-> Truncating filename, learn more in the README`);
