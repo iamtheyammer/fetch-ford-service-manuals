@@ -1,6 +1,6 @@
 # fetch-ford-service-manuals
 
- Downloads HTML and PDF versions of Ford Service Manuals from PTS.
+Downloads HTML and PDF versions of Ford Service Manuals from PTS.
 
 Bought a 72-hour subscription to Ford's service manuals and want to save it permanently?
 Here's the repo for you.
@@ -18,9 +18,14 @@ These manuals are copyrighted by Ford, so don't share them!
 Getting this to work currently requires some knowledge of browser DevTools.
 If you're not sure how to use them, ask a friend who does.
 
-Also, I **highly** recommend using macOS or another POSIX operating system (tested and working on both macOS and Ubuntu on WSL2).
 This script uses [`playwright`](https://github.com/microsoft/playwright), a headless browser interop library, to save documents
-as PDF files rather than raw HTML (this way files include images), and Playwright often works better on POSIX systems.
+as PDF files rather than raw HTML (this way files include images).
+
+### (Avoid) Using Windows
+
+While this script has been verified to work on Windows natively (see [issue #6](https://github.com/iamtheyammer/fetch-ford-service-manuals/issues/6)), it's recommended to run it in WSL. Running in WSL makes installing things like Git and Node far easier.
+
+WSL is a way to run Linux (Ubuntu is recommended for this project) in tandem with Windows. It's far faster than a virtual machine but still uses the real Linux kernel. Learn more and see install instructions [here](https://learn.microsoft.com/en-us/windows/wsl/install).
 
 ### Set up Node (>16.3) and Yarn
 
@@ -29,8 +34,8 @@ as PDF files rather than raw HTML (this way files include images), and Playwrigh
 
 ### Get code and dependencies
 
-1. Clone this repository with `git clone https://github.com/iamtheyammer/fetch-ford-service-manuals.git`
-2. Run `yarn install` to download dependencies
+1. Clone this repository with `git clone https://github.com/iamtheyammer/fetch-ford-service-manuals.git`, and enter the repository's directory (likely with `cd fetch-ford-service-manuals`)
+2. Run `yarn` to download dependencies
 3. Run `yarn playwright-setup` to download and set up Playwright
 
 ### Get data for your car
@@ -38,7 +43,7 @@ as PDF files rather than raw HTML (this way files include images), and Playwrigh
 This script requires some data about your car that's not available in the PTS GUI in order to fetch the correct manual.
 
 1. If you haven't, purchase a PTS subscription from [here](https://www.motorcraftservice.com/Purchase/ViewProduct). The 72 hour subscription is fine.
-2. Once purchased, go to PTS: click [here](https://www.motorcraftservice.com/MySubscriptions), then click on your subscription title. ![how to open PTS](img/open-pts.png).
+2. Once purchased, go to PTS: click [here](https://www.motorcraftservice.com/MySubscriptions), then click on your subscription title. ![how to open PTS](img/open-pts.png)
 3. Once PTS opens, navigate to your car.
     - **Do not use your VIN.**
     - On the left, choose *By Year & Model*, then select your car's year and model.
@@ -83,13 +88,17 @@ You'll notice both a `.pdf` and a `.html` file for each manual page. PDF files a
 
 Wiring diagrams will be in `outputpath/Wiring`.
 
-The `cover.html` file contains the book's cover. If you want to see a somewhat visual table of contents, you can open it in a text editor and change this line `<div id="wsm-tree" style="display:none;">` to `<div id="wsm-tree">`. Then, open it in a browser.
+The `cover.html` file contains the book's cover and a table of contents laid out in bullet points. The tree of those bullet points directly maps to the file structure of the downloaded manual. Note that some characters are not allowed in file/folder names, so characters like slashes, colons, and more are replaced with dashes when saving.
 
-The `toc.json` file contains the computer-readable table of contents, with the name mapped to the "document number", which is used to fetch the PDF. Not sure how useful it is, honestly, but it was helpful while debugging.
+The `toc.json` file contains the computer-readable table of contents, with the name mapped to the "document number", which is used to fetch the PDF.
+
+### Truncated filenames
+
+Most operating systems limit filenames to 255 bytes (not 255 characters). For filenames over 200 characters (which are farily rare), the downloader will truncate the name, then add ` (docID truncated)` onto the end.
+
+If you're having trouble finding a document with a long name, search for it in `toc.json`, where it will be a key with a value. That value is the `docID` which will be in the filename.
 
 ## FAQ
-
-Questions I think someone might ask, not questions anyone has ever asked before.
 
 ### Which vehicles does this work with?
 
@@ -105,10 +114,6 @@ All worked flawlessly!
 ### Why did you make this?
 
 I wanted to have the manual for my car, and I bought the subscription hoping to download a PDF, so that's exactly what I did!
-
-### The code doesn't look that great
-
-Yeah, this was a quick weekend project. Feel free to make it better, though!
 
 ### Why do you fetch pages one-at-a-time?
 
