@@ -24,6 +24,7 @@
   },
   "scripts": {
     "start": "ts-node src/index.ts",
+    "inspect": "yarn node --inspect-brk -r ts-node/register src/index.ts",
     "format": "prettier --write src/**/*.ts",
     "playwright-setup": "playwright install chromium && playwright install-deps chromium"
   }
