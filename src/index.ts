@@ -71,7 +71,9 @@ async function run({
 
   console.log("Saving wiring manual...");
 
-  const cookieStringData = await readFile(cookieString, { encoding: "utf-8" });
+  const cookieStringData = (
+    await readFile(cookieString, { encoding: "utf-8" })
+  ).trim();
   const transformedCookieString = transformCookieString(cookieStringData);
 
   const wiringContext = await browser.newContext({
