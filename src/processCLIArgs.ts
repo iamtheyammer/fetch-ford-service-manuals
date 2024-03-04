@@ -5,6 +5,8 @@ export interface CLIArgs {
   configPath: string;
   outputPath: string;
   cookieString: string;
+  saveHTML: boolean;
+  ignoreSaveErrors: boolean;
 }
 
 export default function processCLIArgs(): CLIArgs {
@@ -23,6 +25,17 @@ export default function processCLIArgs(): CLIArgs {
       name: "outputPath",
       alias: "o",
       type: String,
+    },
+    {
+      name: "saveHTML",
+      type: Boolean,
+      default: false,
+    },
+    {
+      name: "ignoreSaveErrors",
+      alias: "i",
+      type: Boolean,
+      default: false,
     },
     {
       name: "help",
@@ -57,7 +70,20 @@ export default function processCLIArgs(): CLIArgs {
             "{bold Required.} Directory where you'd like the manual to download to. Should be an empty directory.",
         },
         {
+          name: "saveHTML",
+          typeLabel: " ",
+          description:
+            "Save .html files along with .pdf files. Default: false.",
+        },
+        {
+          name: "ignoreSaveErrors",
+          typeLabel: " ",
+          description:
+            "Ignore errors and continue downloading the manual when there's an error saving or PDF-ing a page. Default: false.",
+        },
+        {
           name: "help",
+          typeLabel: " ",
           description: "Print this usage guide.",
         },
       ],
@@ -84,6 +110,8 @@ export default function processCLIArgs(): CLIArgs {
       configPath: options.configFile,
       outputPath: options.outputPath,
       cookieString: options.cookieString,
+      saveHTML: !!options.saveHTML,
+      ignoreSaveErrors: !!options.ignoreSaveErrors,
     };
   } catch (e: any) {
     console.error(e);

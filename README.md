@@ -68,11 +68,11 @@ This script requires some data about your car that's not available in the PTS GU
 
 ### Download the manual!
 
-To download the manual, run `yarn start -c templates/params.json -s templates/cookieString.txt -o /directory/where/you/want/the/downloaded/manual/`. You should see output that looks like [this](img/example-output.png).
+To download the manual as PDFs, run `yarn start -c templates/params.json -s templates/cookieString.txt -o /directory/where/you/want/the/downloaded/manual/`. You should see output that looks like [this](img/example-output.png).
 
 Make sure that the directory for the downloaded manual is empty-- it'll have lots of subfolders.
 
-You can get more param information by running `yarn start --help`.
+You can get more param information by running `yarn start --help`. Notably, `--saveHTML` will save `.html` files along with the `.pdf` files downloaded by default, and `--ignoreSaveErrors` will continue downloading manuals if an error is encountered, skipping the file with an error.
 
 It can take a little while! On a fast computer with a fast internet connection, and, more importantly, a fast disk drive, over 15 minutes to download the manuals for the 2005 Taurus. Be patient!
 
@@ -82,9 +82,7 @@ Also, the resulting folder is pretty sizeable. The folder for the 2005 Taurus wa
 
 This bot downloads the **entire** workshop manual and **all** wiring diagrams for the vehicle you set up.
 
-The folder structure in the output directory will mimic the structure on PTS, so if a file has a path like `1: General Information -> 00: Service Information -> 100-00 General Information -> About this Manual`, it will be in the folder `outputpath/1: General Information/00: Serivce Information/100-00 General Information/About this Manual.html`.
-
-You'll notice both a `.pdf` and a `.html` file for each manual page. PDF files are often easier to share and view, especially on mobile devices. They also include images in case Ford decides to change how images are stored in the future.
+The folder structure in the output directory will mimic the structure on PTS, so if a file has a path like `1: General Information -> 00: Service Information -> 100-00 General Information -> About this Manual`, it will be in the folder `outputpath/1: General Information/00: Service Information/100-00 General Information/About this Manual.pdf`.
 
 Wiring diagrams will be in `outputpath/Wiring`.
 

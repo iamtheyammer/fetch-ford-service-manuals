@@ -6,6 +6,7 @@ import { createWriteStream } from "fs";
 import { Page } from "playwright";
 import saveStream from "./saveStream";
 import { type as osType } from "os";
+import { CLIArgs } from "./processCLIArgs";
 
 // NTFS and FAT have many restricted characters in filenames.
 // We need to remove these here because keys in this
@@ -21,11 +22,14 @@ const nameRegex =
   osType() === "Windows_NT" ? /[<>:"\\/|?*\0\u2013]/g : /[\\/\0\u2013]/g;
 const sanitizeName = (name: string): string => name.replace(nameRegex, "-");
 
+export type SaveOptions = Pick<CLIArgs, "saveHTML" | "ignoreSaveErrors">;
+
 export default async function saveEntireManual(
   path: string,
   toc: any,
   fetchPageParams: FetchManualPageParams,
-  browserPage: Page
+  browserPage: Page,
+  options: SaveOptions
 ) {
   const exploded = Object.entries(toc);
 
@@ -58,9 +62,12 @@ export default async function saveEntireManual(
         continue;
       }
 
-      console.log(`Downloading manual page ${name}.html (docID: ${docID})`);
+      console.log(
+        `Downloading manual page ${name} as ${
+          options.saveHTML ? "HTML, " : ""
+        }PDF (docID: ${docID})`
+      );
       let filename = sanitizeName(name);
-
       // 255 is the max filename length on most filesystems, but 200 should be enough regardless
       if (filename.length > 200) {
         filename =
@@ -74,20 +81,35 @@ export default async function saveEntireManual(
         console.log(`-> Truncating filename, learn more in the README`);
       }
 
-      const pageHTML = await fetchManualPage({
-        ...fetchPageParams,
-        searchNumber: docID,
-      });
+      try {
+        const pageHTML = await fetchManualPage({
+          ...fetchPageParams,
+          searchNumber: docID,
+        });
 
-      const htmlPath = resolve(join(path, `/${filename}.html`));
+        if (options.saveHTML) {
+          const htmlPath = resolve(join(path, `/${filename}.html`));
+          await writeFile(htmlPath, pageHTML);
+        }
 
-      await writeFile(htmlPath, pageHTML);
-
-      await savePageAsPDF(
-        htmlPath,
-        join(path, `/${filename}.pdf`),
-        browserPage
-      );
+        await saveHTMLAsPDF(
+          pageHTML,
+          join(path, `/${filename}.pdf`),
+          browserPage
+        );
+      } catch (e) {
+        if (options.ignoreSaveErrors) {
+          console.error(
+            `Continuing to download after error with ${name} (docID ${docID}):`,
+            e
+          );
+        } else {
+          console.error(
+            `Encountered an error downloading ${name} (docID ${docID})`
+          );
+          throw e;
+        }
+      }
     } else {
       // create folder and traverse
       const newPath = join(path, sanitizeName(name));
@@ -102,18 +124,35 @@ export default async function saveEntireManual(
         }
       }
 
-      await saveEntireManual(newPath, docID, fetchPageParams, browserPage);
+      await saveEntireManual(
+        newPath,
+        docID,
+        fetchPageParams,
+        browserPage,
+        options
+      );
     }
   }
 }
 
-export async function savePageAsPDF(
-  htmlPath: string,
+export async function saveHTMLAsPDF(
+  htmlContent: string,
   pdfPath: string,
   page: Page
 ): Promise<void> {
-  await page.goto(`file://${htmlPath}`, { waitUntil: "load" });
+  await page.setContent(htmlContent, { waitUntil: "load" });
   await page.pdf({
     path: pdfPath,
   });
 }
+
+// export async function saveURLAsPDF(
+//   htmlPath: string,
+//   pdfPath: string,
+//   page: Page
+// ): Promise<void> {
+//   await page.goto(`file://${htmlPath}`, { waitUntil: "load" });
+//   await page.pdf({
+//     path: pdfPath,
+//   });
+// }

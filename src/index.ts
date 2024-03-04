@@ -13,7 +13,12 @@ import saveEntireManual from "./saveEntireManual";
 import readConfig from "./readConfig";
 import processCLIArgs, { CLIArgs } from "./processCLIArgs";
 
-async function run({ configPath, outputPath, cookieString }: CLIArgs) {
+async function run({
+  configPath,
+  outputPath,
+  cookieString,
+  ...restArgs
+}: CLIArgs) {
   const config = await readConfig(configPath);
 
   // create output dir
@@ -60,7 +65,8 @@ async function run({ configPath, outputPath, cookieString }: CLIArgs) {
     outputPath,
     tableOfContents,
     config.workshop,
-    browserPage
+    browserPage,
+    restArgs
   );
 
   console.log("Saving wiring manual...");
