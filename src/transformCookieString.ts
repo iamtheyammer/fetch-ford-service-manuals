@@ -10,15 +10,9 @@ export default function transformCookieString(
 ): TransformedCookie[] {
   const pairs = cookieString
     .split(";")
-    .map(function (c) {
-      return c.trim().split("=").map(decodeURIComponent);
-    })
+    .map((c: string) => c.trim().split("=").map(decodeURIComponent))
     .reduce(function (a, b) {
-      try {
-        a[b[0]] = JSON.parse(b[1]);
-      } catch (e) {
-        a[b[0]] = b[1];
-      }
+      a[b[0]] = b.slice(1).join("=");
       return a;
     }, {} as { [cookie: string]: string });
 
