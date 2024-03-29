@@ -35,6 +35,9 @@ WSL is a way to run Linux (Ubuntu is recommended for this project) in tandem wit
 ### Get code and dependencies
 
 1. Clone this repository with `git clone https://github.com/iamtheyammer/fetch-ford-service-manuals.git`, and enter the repository's directory (likely with `cd fetch-ford-service-manuals`)
+    - Previously cloned? Run `git pull` to get up to date!
+    - If `git pull` does **not** say `Already up to date.`, run the next 2 steps to ensure your dependencies are up-to-date.
+    - If you get an error while pulling, try running `git stash`, `git pull`, then `git stash apply` to un-stash your files.
 2. Run `yarn` to download dependencies
 3. Run `yarn playwright-setup` to download and set up Playwright
 

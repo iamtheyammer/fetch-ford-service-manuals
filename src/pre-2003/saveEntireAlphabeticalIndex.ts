@@ -1,7 +1,8 @@
 import { Pre2003AlphabeticalIndex } from "./fetchAlphabeticalIndex";
 import { Page } from "playwright";
-import { sanitizeName, SaveOptions } from "../saveEntireManual";
+import { SaveOptions } from "../saveEntireManual";
 import { join, resolve } from "path";
+import { fileExists, sanitizeName } from "../utils";
 import { writeFile } from "fs/promises";
 
 export default async function saveEntirePre2003AlphabeticalIndex(
@@ -19,16 +20,21 @@ export default async function saveEntirePre2003AlphabeticalIndex(
       continue;
     }
 
+    const pdfPath = join(outputPath, `/${filename}.pdf`);
+
+    if (await fileExists(pdfPath)) {
+      console.log(`Skipping ${title} because it already exists.`);
+      continue;
+    }
+
     console.log(`Saving ${title}...`);
     try {
       await browserPage.goto("https://www.fordservicecontent.com" + href, {
         waitUntil: "load",
-        // 30 secs
-        timeout: 30000,
       });
 
       await browserPage.pdf({
-        path: join(outputPath, `/${filename}.pdf`),
+        path: pdfPath,
       });
 
       if (options.saveHTML) {

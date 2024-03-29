@@ -4,23 +4,8 @@ import fetchManualPage, { FetchManualPageParams } from "./fetchManualPage";
 import client from "./client";
 import { Page } from "playwright";
 import saveStream from "./saveStream";
-import { type as osType } from "os";
 import { CLIArgs } from "./processCLIArgs";
-
-// NTFS and FAT have many restricted characters in filenames.
-// We need to remove these here because keys in this
-// tree will be used to create file and folder names.
-// https://en.wikipedia.org/wiki/Filename#Comparison_of_filename_limitations
-
-// Slashes are not included here so that the names in cover.html match the ones here.
-// They are removed in saveEntireManual as files are written to disk.
-
-// Emdashes (\u2013) are included as they are multi-byte and throw off length
-// calculations where 1 character is expected to be 1 byte.
-const nameRegex =
-  osType() === "Windows_NT" ? /[<>:"\\/|?*\0\u2013]/g : /[\\/\0\u2013]/g;
-export const sanitizeName = (name: string): string =>
-  name.replace(nameRegex, "-");
+import { fileExists, sanitizeName } from "./utils";
 
 export type SaveOptions = Pick<CLIArgs, "saveHTML" | "ignoreSaveErrors">;
 
@@ -42,7 +27,6 @@ export default async function saveEntireManual(
         console.log(`Downloading manual PDF ${name} ${docID}`);
 
         try {
-          const url = new URL(docID);
           const pdfReq = await client({
             url: docID,
             responseType: "stream",

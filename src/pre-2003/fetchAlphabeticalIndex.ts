@@ -1,6 +1,6 @@
 import client from "../client";
 import { JSDOM } from "jsdom";
-import { sanitizeName } from "../saveEntireManual";
+import { sanitizeName } from "../utils";
 
 export default async function fetchPre2003AlphabeticalIndex(
   url: string,
