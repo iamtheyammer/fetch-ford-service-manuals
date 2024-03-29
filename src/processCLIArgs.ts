@@ -4,7 +4,7 @@ import commandLineUsage from "command-line-usage";
 export interface CLIArgs {
   configPath: string;
   outputPath: string;
-  cookieString: string;
+  cookiePath: string;
   saveHTML: boolean;
   ignoreSaveErrors: boolean;
 }
@@ -102,14 +102,13 @@ export default function processCLIArgs(): CLIArgs {
     if (!options.configFile || !options.outputPath || !options.cookieString) {
       console.error("Missing required args!");
       // console.log(options);
-
       console.log(usage);
       process.exit(1);
     }
     return {
       configPath: options.configFile,
       outputPath: options.outputPath,
-      cookieString: options.cookieString,
+      cookiePath: options.cookieString,
       saveHTML: !!options.saveHTML,
       ignoreSaveErrors: !!options.ignoreSaveErrors,
     };

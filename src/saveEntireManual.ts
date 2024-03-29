@@ -2,7 +2,6 @@ import { mkdir, writeFile, access } from "fs/promises";
 import { join, resolve } from "path";
 import fetchManualPage, { FetchManualPageParams } from "./fetchManualPage";
 import client from "./client";
-import { createWriteStream } from "fs";
 import { Page } from "playwright";
 import saveStream from "./saveStream";
 import { type as osType } from "os";
@@ -20,7 +19,8 @@ import { CLIArgs } from "./processCLIArgs";
 // calculations where 1 character is expected to be 1 byte.
 const nameRegex =
   osType() === "Windows_NT" ? /[<>:"\\/|?*\0\u2013]/g : /[\\/\0\u2013]/g;
-const sanitizeName = (name: string): string => name.replace(nameRegex, "-");
+export const sanitizeName = (name: string): string =>
+  name.replace(nameRegex, "-");
 
 export type SaveOptions = Pick<CLIArgs, "saveHTML" | "ignoreSaveErrors">;
 

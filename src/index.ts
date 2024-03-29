@@ -7,16 +7,18 @@ import fetchTableOfContents, {
 } from "./wiring/fetchTableOfContents";
 import saveEntireWiring from "./wiring/saveEntireWiring";
 import transformCookieString from "./transformCookieString";
-import { chromium } from "playwright";
+import { chromium, Page } from "playwright";
 import { join } from "path";
 import saveEntireManual from "./saveEntireManual";
-import readConfig from "./readConfig";
+import readConfig, { Config } from "./readConfig";
 import processCLIArgs, { CLIArgs } from "./processCLIArgs";
+import fetchPre2003AlphabeticalIndex from "./pre-2003/fetchAlphabeticalIndex";
+import saveEntirePre2003AlphabeticalIndex from "./pre-2003/saveEntireAlphabeticalIndex";
 
 async function run({
   configPath,
   outputPath,
-  cookieString,
+  cookiePath,
   ...restArgs
 }: CLIArgs) {
   const config = await readConfig(configPath);
@@ -31,53 +33,54 @@ async function run({
     }
   }
 
-  const tocFetchParams: FetchTreeAndCoverParams = {
-    ...config.workshop,
-    CategoryDescription: "GSIXML",
-    category: "33",
-  };
+  console.log("Processing cookies...");
+  const cookieString = (
+    await readFile(cookiePath, { encoding: "utf-8" })
+  ).trim();
+  const transformedCookieString = transformCookieString(cookieString);
 
   console.log("Creating a headless chromium instance...");
   const browser = await chromium.launch({
     // fix getting wiring SVGs
     args: ["--disable-web-security"],
+    headless: true,
   });
 
-  const pageParams = {
+  const workshopContextParams = {
     userAgent:
       "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36",
   };
-  const browserPage = await browser.newPage(pageParams);
-  browserPage.route("FordEcat.jpg", (route) => route.abort());
+  const workshopContext = await browser.newContext(workshopContextParams);
 
-  console.log("Downloading and processing table of contents...");
-  const { tableOfContents, pageHTML } = await fetchTreeAndCover(tocFetchParams);
+  if (parseInt(config.workshop.modelYear) >= 2003) {
+    const browserPage = await workshopContext.newPage();
+    await browserPage.route("FordEcat.jpg", (route) => route.abort());
 
-  await writeFile(
-    join(outputPath, "toc.json"),
-    JSON.stringify(tableOfContents, null, 2)
-  );
-  const coverPath = join(outputPath, "cover");
-  await writeFile(coverPath + ".html", pageHTML);
+    await modernWorkshop(config, outputPath, browserPage, restArgs);
+  } else {
+    console.log(
+      "Downloading pre-2003 workshop manual, please see README for details..."
+    );
 
-  console.log("Saving manual files...");
-  await saveEntireManual(
-    outputPath,
-    tableOfContents,
-    config.workshop,
-    browserPage,
-    restArgs
-  );
+    await workshopContext.addCookies(transformedCookieString);
+    const browserPage = await workshopContext.newPage();
+
+    await pre2003Workshop(
+      config,
+      outputPath,
+      cookieString,
+      browserPage,
+      restArgs
+    );
+  }
+
+  console.log("Saved workshop manual!");
+  await workshopContext.close();
 
   console.log("Saving wiring manual...");
 
-  const cookieStringData = (
-    await readFile(cookieString, { encoding: "utf-8" })
-  ).trim();
-  const transformedCookieString = transformCookieString(cookieStringData);
-
   const wiringContext = await browser.newContext({
-    ...pageParams,
+    ...workshopContextParams,
     viewport: {
       width: 2560,
       height: 1440,
@@ -103,19 +106,88 @@ async function run({
     contentmarket: config.workshop.contentmarket,
   };
 
-  const wiringToC = await fetchTableOfContents(wiringParams, cookieStringData);
+  const wiringToC = await fetchTableOfContents(wiringParams, cookieString);
 
   await saveEntireWiring(
     outputPath,
     config.workshop,
     wiringParams,
     wiringToC,
-    cookieStringData,
+    cookieString,
     wiringPage
   );
 
+  await wiringContext.close();
+
   console.log("Manual downloaded, closing browser");
   await browser.close();
+}
+
+async function modernWorkshop(
+  config: Config,
+  outputPath: string,
+  browserPage: Page,
+  restArgs: any
+) {
+  console.log("Downloading and processing table of contents...");
+  const tocFetchParams: FetchTreeAndCoverParams = {
+    ...config.workshop,
+    CategoryDescription: "GSIXML",
+    category: "33",
+  };
+  const { tableOfContents, pageHTML } = await fetchTreeAndCover(tocFetchParams);
+
+  await writeFile(
+    join(outputPath, "toc.json"),
+    JSON.stringify(tableOfContents, null, 2)
+  );
+  const coverPath = join(outputPath, "cover");
+  await writeFile(coverPath + ".html", pageHTML);
+
+  console.log("Saving manual files...");
+  await saveEntireManual(
+    outputPath,
+    tableOfContents,
+    config.workshop,
+    browserPage,
+    restArgs
+  );
+}
+
+async function pre2003Workshop(
+  config: Config,
+  outputPath: string,
+  rawCookieString: string,
+  browserPage: Page,
+  restArgs: any
+) {
+  console.log("Downloading and processing alphabetical index...");
+  const { documentList, pageHTML, modifiedHTML } =
+    await fetchPre2003AlphabeticalIndex(
+      config.pre_2003.alphabeticalIndexURL,
+      rawCookieString
+    );
+
+  // usable ToC
+  await writeFile(join(outputPath, "AAA_Table_Of_Contents.html"), modifiedHTML);
+  // original ToC
+  await writeFile(
+    join(outputPath, "AA_originalTableOfContents.html"),
+    pageHTML
+  );
+  // JSON ToC
+  await writeFile(
+    join(outputPath, "AA_alphabeticalIndex.json"),
+    JSON.stringify(documentList, null, 2)
+  );
+
+  console.log("Saving manual files...");
+  await saveEntirePre2003AlphabeticalIndex(
+    outputPath,
+    documentList,
+    browserPage,
+    restArgs
+  );
 }
 
 const args = processCLIArgs();

@@ -22,5 +22,8 @@
   "wiring": {
     "environment": "prod_1_3_372022",
     "bookType": "svg"
+  },
+  "pre_2003": {
+    "alphabeticalIndexURL": "https://www.fordservicecontent.com/pubs/content/....."
   }
 }

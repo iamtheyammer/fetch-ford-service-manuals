@@ -1,11 +1,14 @@
 import { FetchManualPageParams } from "./fetchManualPage";
 import { readFile } from "fs/promises";
 
-interface Config {
+export interface Config {
   workshop: FetchManualPageParams;
   wiring: {
     environment: string;
     bookType: string;
+  };
+  pre_2003: {
+    alphabeticalIndexURL: string;
   };
 }
 

@@ -38,9 +38,7 @@ WSL is a way to run Linux (Ubuntu is recommended for this project) in tandem wit
 2. Run `yarn` to download dependencies
 3. Run `yarn playwright-setup` to download and set up Playwright
 
-### Get data for your car
-
-This script requires some data about your car that's not available in the PTS GUI in order to fetch the correct manual.
+### Set up PTS
 
 1. If you haven't, purchase a PTS subscription from [here](https://www.motorcraftservice.com/Purchase/ViewProduct). The 72 hour subscription is fine.
 2. Once purchased, go to PTS: click [here](https://www.motorcraftservice.com/MySubscriptions), then click on your subscription title. ![how to open PTS](img/open-pts.png)
@@ -48,23 +46,53 @@ This script requires some data about your car that's not available in the PTS GU
     - **Do not use your VIN.**
     - On the left, choose *By Year & Model*, then select your car's year and model.
     - Press GO once selected.
-4. Open DevTools, and navigate to the Network tab.
-5. Click on the Workshop tab in PTS.
-6. Filter for the one POST to `https://www.fordservicecontent.com/Ford_Content/PublicationRuntimeRefreshPTS//publication/prod_1_3_372022/TreeAndCover/workshop/32/~WSLL/{some numbers here}`. It should look similar to the request in [this photo](img/workshop-request.png).
-7. Click on that request, and look at the sent form data.
-8. Open [`templates/params.json`](templates/params.json), and copy information from that request into the values of the JSON `.workshop` field.
+
+### **2003 or newer:** Get data for your car
+
+**If your vehicle was made BEFORE 2003, use [these](#2002-or-older-get-data-for-your-car) instructions.**
+
+This script requires some data about your car that's not available in the PTS GUI in order to fetch the correct manual.
+
+1. Open DevTools, and navigate to the Network tab.
+2. Click on the Workshop tab in PTS.
+3. Filter for the one POST to `https://www.fordservicecontent.com/Ford_Content/PublicationRuntimeRefreshPTS//publication/prod_1_3_372022/TreeAndCover/workshop/32/~WSLL/{some numbers here}`. It should look similar to the request in [this photo](img/workshop-request.png).
+4. Click on that request, and look at the sent form data.
+5. Open [`templates/params.json`](templates/params.json), and copy information from that request into the values of the JSON `.workshop` field.
     - **Do not add fields. Only change values.**
     - Change the values to match. You probably won't need to change anything under the line break.
     - If you can't find the Book Title or Wiring Book Title, look in the query string parameters. **Do not leave them blank!**
-9. Clear the DevTools Network pane (click on the Trash Can)
-10. Click the Wiring tab at the top of PTS.
-11. Filter for the GET request to this URL: `https://www.fordservicecontent.com/Ford_Content/PublicationRuntimeRefreshPTS//wiring/TableofContent` (there are query params at the end, that's ok). It should look similar to the request in [this photo](img/wiring-request.png).
-12. Copy the `environment` and `bookType` query params into `.wiring` in `params.json`.
-13. Save `params.json` and open `cookieString.txt`
-14. Clear the content in `cookieString.txt`, and replace it with the **value** of the `Cookie` header sent in the `TableofContent` request (step 11).
-    - Do **not** include the name (`cookieString.txt` should **not** include `Cookie:`, for example.)
-    - NOTE: In Firefox, you MUST enable the *Raw* toggle at the top right of Response Headers, then copy it from there. If you don't, you'll get an invalid character error when trying to fetch wiring diagrams.
-15. Save `cookieString.txt`.
+6. Get your wiring data: follow instructions [here](#all-vehicles-get-wiring-data).
+
+### **2002 or older:** Get data for your car
+
+**If your vehicle was made IN 2003 or LATER, use [these](#2003-or-newer-get-data-for-your-car) instructions.**
+
+1. Click on the Workshop tab in PTS.
+   - You may see a couple manuals, often a "Workshop Manual" and a "Body Collision Repair Manual". You can use this application to download both-- just repeat the process for each manual, just remember to change the output path for each manual!
+   - To proceed, click on either manual.
+2. In the sidebar, right click on "Alphabetical Index", and click "Copy Link Address" (see [picture](img/pre-2003-index.jpg)).
+3. Open [`templates/params.json`](templates/params.json), and change only:
+    - `workshop.modelYear` to the year of your car
+    - `pre_2003.alphabeticalIndexURL` to the URL you copied in step 2
+    - The rest will be filled in later
+4. Open DevTools in your browser.
+5. Get your wiring data: follow instructions [here](#all-vehicles-get-wiring-data).
+
+### **All Vehicles:** Get wiring data
+
+1. Clear the DevTools Network pane (click on the trash can or circle with a line through it)
+2. Click the Wiring tab at the top of PTS.
+3. Filter for the GET request to this URL: `https://www.fordservicecontent.com/Ford_Content/PublicationRuntimeRefreshPTS//wiring/TableofContent` (there are query params at the end, that's ok). It should look similar to the request in [this photo](img/wiring-request.png).
+4. Copy the `environment` and `bookType` query params into `.wiring` in `params.json`.
+   - **If your vehicle was made before 2003** (or if `WiringBookTitle` or `WiringBookCode` are missing), you may find these in another request to `https://www.fordtechservice.dealerconnection.com/wiring/TableOfContents` (with some query params at the end):
+   - `booktitle` → `WiringBookTitle`
+   - `book` → `WiringBookCode`
+   - Use these two requests to fill in `params.json` as best as you can.
+5. Save `params.json` and open `cookieString.txt`
+6. Clear the content in `cookieString.txt`, and replace it with the **value** of the `Cookie` header sent in the `TableofContent` request (step 3).
+   - Do **not** include the name (`cookieString.txt` should **not** include `Cookie:`, for example.)
+   - NOTE: In Firefox, you MUST enable the *Raw* toggle at the top right of Response Headers, then copy it from there. If you don't, you'll get an invalid character error when trying to fetch wiring diagrams.
+7. Save `cookieString.txt`.
 
 ### Download the manual!
 
@@ -82,19 +110,37 @@ Also, the resulting folder is pretty sizeable. The folder for the 2005 Taurus wa
 
 This bot downloads the **entire** workshop manual and **all** wiring diagrams for the vehicle you set up.
 
-The folder structure in the output directory will mimic the structure on PTS, so if a file has a path like `1: General Information -> 00: Service Information -> 100-00 General Information -> About this Manual`, it will be in the folder `outputpath/1: General Information/00: Service Information/100-00 General Information/About this Manual.pdf`.
+### **All vehicles:** Wiring diagrams
 
-Wiring diagrams will be in `outputpath/Wiring`.
+Wiring diagrams will be in `outputpath/Wiring`. There's also a `toc.json` file with the table of contents for the wiring diagrams.
+
+### **2003 or newer:** Workshop manual
+
+The folder structure in the output directory will mimic the structure on PTS, so if a file has a path like `1: General Information -> 00: Service Information -> 100-00 General Information -> About this Manual`, it will be in the folder `outputpath/1: General Information/00: Service Information/100-00 General Information/About this Manual.pdf`.
 
 The `cover.html` file contains the book's cover and a table of contents laid out in bullet points. The tree of those bullet points directly maps to the file structure of the downloaded manual. Note that some characters are not allowed in file/folder names, so characters like slashes, colons, and more are replaced with dashes when saving.
 
 The `toc.json` file contains the computer-readable table of contents, with the name mapped to the "document number", which is used to fetch the PDF.
 
-### Truncated filenames
+#### Truncated filenames
 
 Most operating systems limit filenames to 255 bytes (not 255 characters). For filenames over 200 characters (which are fairly rare), the downloader will truncate the name, then add ` (docID truncated)` onto the end.
 
 If you're having trouble finding a document with a long name, search for it in `toc.json`, where it will be a key with a value. That value is the `docID` which will be in the filename.
+
+### **2002 or older:** Workshop manual
+
+Vehicles from 2002 or older have a different structure in the manual, so thsi took just uses teh alphabetical index, meaning the output is a bit different. You simply get a flat structure with all pages in the manual in the output folder you specified.
+
+You can easily browse the manual by opening `outputpath/AA_Table_Of_Contents.html`-- all the links work except for the letters at the top.
+
+There are also a few special files:
+
+- `AA_Table_Of_Contents.html` is a special, processed table of contents where all the links work! Open it in your browser to navigate the manual.
+- `AAA_alphabeticalIndex.json` is a JSON file with all the links in the alphabetical index. It's not as useful as the table of contents, but it's there if you need it. It's a result of the processing script.
+- `AAA_originalTableOfContents.html` is the original table of contents, so the links don't work. It's there if you need it. It's a result of the processing script.
+
+These files are prefixed with `AAA` so they appear at the top of the file list in most file browsers.
 
 ## FAQ
 
@@ -102,12 +148,18 @@ If you're having trouble finding a document with a long name, search for it in `
 
 All the ones I've tested. Just for fun, I tried:
 
+- 1995 F-150
+- 2002 Taurus
 - 2006 Taurus/Sable
 - 2008 Mustang
 - 2020 MKZ
 - 2022 F-150
 
 All worked flawlessly!
+
+### How can I support this project?
+
+If this project was helpful to you, you can support this project on GitHub sponsors (click the "Sponsor" button at the top of the page) or by sharing it!
 
 ### Why did you make this?
 

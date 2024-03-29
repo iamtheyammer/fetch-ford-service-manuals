@@ -2,7 +2,7 @@ import {
   FetchWiringTableOfContents,
   WiringTableOfContents,
 } from "./fetchTableOfContents";
-import { mkdir } from "fs/promises";
+import { mkdir, writeFile } from "fs/promises";
 import { join } from "path";
 import fetchBasicPage from "./fetchBasicPage";
 import saveStream from "../saveStream";
@@ -26,6 +26,8 @@ export default async function saveEntireWiring(
       throw e;
     }
   }
+
+  await writeFile(join(wiringPath, "toc.json"), JSON.stringify(toc, null, 2));
 
   for (let i = 0; i < toc.length; i++) {
     const doc = toc[i];
@@ -60,7 +62,11 @@ export default async function saveEntireWiring(
       `Downloading wiring manual page ${doc.Title} (${doc.Filename}, #${doc.Number})`
     );
 
-    const docStream = await fetchBasicPage(doc.Filename, cookieString);
+    const docStream = await fetchBasicPage(
+      doc.Filename,
+      fetchWiringParams.book,
+      cookieString
+    );
 
     await saveStream(
       docStream,
