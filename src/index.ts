@@ -62,6 +62,16 @@ async function run({
       "Downloading pre-2003 workshop manual, please see README for details..."
     );
 
+    if (
+      config.pre_2003.alphabeticalIndexURL ===
+      "https://www.fordservicecontent.com/pubs/content/....."
+    ) {
+      console.error(
+        "Please set the URL for the pre-2003 alphabetical index in the config file."
+      );
+      process.exit(1);
+    }
+
     await workshopContext.addCookies(transformedCookieString);
     const browserPage = await workshopContext.newPage();
 

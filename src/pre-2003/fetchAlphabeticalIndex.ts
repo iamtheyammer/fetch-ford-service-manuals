@@ -80,7 +80,10 @@ function processPre2003AlphabeticalIndex(data: string): {
         continue;
       }
 
-      const sanitizedTitle = sanitizeName(aChild.textContent!.trim());
+      let sanitizedTitle = sanitizeName(aChild.textContent!.trim());
+      if (sanitizedTitle.length > 200) {
+        sanitizedTitle = sanitizedTitle.substring(0, 200) + " (truncated)";
+      }
 
       documentList.push({
         href: aChild.href,

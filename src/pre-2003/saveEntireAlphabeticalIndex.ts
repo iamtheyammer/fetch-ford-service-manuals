@@ -23,6 +23,8 @@ export default async function saveEntirePre2003AlphabeticalIndex(
     try {
       await browserPage.goto("https://www.fordservicecontent.com" + href, {
         waitUntil: "load",
+        // 30 secs
+        timeout: 30000,
       });
 
       await browserPage.pdf({
