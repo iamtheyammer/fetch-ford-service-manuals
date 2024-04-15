@@ -133,7 +133,7 @@ If you're having trouble finding a document with a long name, search for it in `
 
 ### **2002 or older:** Workshop manual
 
-Vehicles from 2002 or older have a different structure in the manual, so thsi took just uses teh alphabetical index, meaning the output is a bit different. You simply get a flat structure with all pages in the manual in the output folder you specified.
+Vehicles from 2002 or older have a different, harder-to-fetch structure in the manual, so this tool just uses the alphabetical index. This means the output is a bit different; you'll simply get a flat structure with all pages in the manual in the output folder you specified.
 
 You can easily browse the manual by opening `outputpath/AA_Table_Of_Contents.html`-- all the links work except for the letters at the top.
 
@@ -162,7 +162,7 @@ All worked flawlessly!
 
 ### How can I support this project?
 
-If this project was helpful to you, you can support this project on GitHub sponsors (click the "Sponsor" button at the top of the page) or by sharing it!
+If this project was helpful to you, you can support this project on GitHub sponsors (click the "Sponsor" button at the top of the page), [buy me a coffee](https://buymeacoffee.com/iamtheyammer), or just share it!
 
 ### Why did you make this?
 
