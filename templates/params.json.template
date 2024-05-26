@@ -1,0 +1,30 @@
+{
+  "workshop": {
+    "vehicleId": "123",
+    "modelYear": "0000",
+    "channel": "9",
+    "book": "S0X",
+    "bookTitle": "0000 CarType",
+    "WiringBookCode": "E0X",
+    "WiringBookTitle": "0000 CarType",
+    "booktype": "ody",
+
+    "country": "",
+    "language": "EN-US",
+    "contentmarket": "US",
+    "contentlanguage": "EN",
+    "languageOdysseyCode": "ENUSA",
+    "searchNumber": "0",
+    "Vid": "CZF",
+    "byvin": "NO",
+    "marketGroup": "NA"
+  },
+  "wiring": {
+    "environment": "",
+    "bookType": "svg",
+    "languageCode": "ENUSA"
+  },
+  "pre_2003": {
+    "alphabeticalIndexURL": "https://www.fordservicecontent.com/pubs/content/....."
+  }
+}

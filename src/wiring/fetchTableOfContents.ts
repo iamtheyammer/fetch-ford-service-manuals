@@ -6,6 +6,7 @@ export interface FetchWiringTableOfContents {
   bookType: string;
   contentmarket: string;
   contentlanguage: string;
+  languageCode: string;
 }
 
 export interface BasicPage {
@@ -24,7 +25,7 @@ export interface Page {
 }
 
 export interface WiringTableOfContents {
-  Type: "Page" | "BasicPage";
+  Type: "Page" | "BasicPage" | "Connectors" | "LocIndex";
   Number: string;
   Maintitle: string;
   Page: string;

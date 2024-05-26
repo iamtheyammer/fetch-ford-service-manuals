@@ -1,33 +1,30 @@
 import { Page } from "playwright";
 import { stringify } from "qs";
 
-export interface FetchWiringPageParams {
+export interface FetchConnectorParams {
   book: string;
   vehicleId: string;
-  cell: string;
-  page: string;
   country: string;
   bookType: string;
   language: string;
+  item: string;
   languageCode: string;
-  title: string;
-  market: string;
-  // booktitle: string;
+  page: string;
+  cell: string;
 }
 
-export default async function fetchPage(
-  params: FetchWiringPageParams,
+export default async function fetchConnectorPage(
+  params: FetchConnectorParams,
   browserPage: Page,
   saveImagePath: string
 ): Promise<void> {
-  const url = `https://www.fordtechservice.dealerconnection.com/Wiring/Page?${stringify(
+  const url = `https://www.fordtechservice.dealerconnection.com/Wiring/face/?${stringify(
     params
   )}`;
-  console.log(url);
-
   await browserPage.goto(url, {
     waitUntil: "networkidle",
   });
+  console.log(url);
   await browserPage.screenshot({
     path: saveImagePath,
   });

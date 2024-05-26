@@ -2,7 +2,7 @@ import client from "./client";
 import { stringify } from "qs";
 
 export interface FetchManualPageParams {
-  vechicleId: string;
+  vehicleId: string;
   modelYear: string;
   channel: string;
   book: string;
