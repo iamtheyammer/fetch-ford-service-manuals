@@ -1,4 +1,15 @@
-1. Create copy of file and name "cookieString.txt"
+1. Create copy of this file named "cookieString.txt"
 2. Clear contents
-3. Copy/Paste cookies
-4. Remove ak_bmsc cookie
+3. Copy/Paste cookies. You should have the following cookies:
+	CONTENT_AUTH
+	CONTENT_PERMISSIONS
+	dtCookie
+	Ford.TSO.PTSSuite
+	TPS%2DPERM
+	PREFERENCES
+	TPS%2DMEMBERSHIP
+	AKA_A2
+	bm_mi
+	bm_sv
+	PTSSession
+4. Ensure the cookie string does not contain the ak_bmsc cookie

@@ -1,7 +1,7 @@
 import client from "../client";
 
-
-export interface FetchWiringPageList {
+export interface FetchBasicPageNameList {
+  environment: string;
   book: string;
   cell: string;
   title: string;
@@ -9,17 +9,15 @@ export interface FetchWiringPageList {
   bookType: string;
   contentmarket: string;
   contentlanguage: string;
-  languageCode: string;
 }
 
-
-export default async function fetchPageList(
-  params: FetchWiringPageList,
+export default async function fetchBasicPageName(
+  params: FetchBasicPageNameList,
   cookieString: string
-): Promise<any> {
+): Promise<string> {
   const req = await client({
     method: "GET",
-    url: "https://www.fordservicecontent.com/Ford_Content/PublicationRuntimeRefreshPTS//wiring/PageList",
+    url: "https://www.fordservicecontent.com/Ford_Content/PublicationRuntimeRefreshPTS//wiring/BasicSelectedFileName",
     params: {
       ...params,
       fromPageBase: "https://www.fordtechservice.dealerconnection.com",
