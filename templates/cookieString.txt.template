@@ -1,6 +1,6 @@
 1. Create copy of this file named "cookieString.txt"
 2. Clear contents
-3. Copy/Paste cookies. You should have the following cookies:
+3. Copy/Paste cookies as described in the README. You should have the following cookies:
 	CONTENT_AUTH
 	CONTENT_PERMISSIONS
 	dtCookie

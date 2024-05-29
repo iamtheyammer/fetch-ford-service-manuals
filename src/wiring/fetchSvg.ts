@@ -1,5 +1,3 @@
-import { Page } from "playwright";
-import { stringify } from "qs";
 import wiringClient from "./wiringClient";
 
 export interface FetchWiringPageParams {
@@ -13,7 +11,6 @@ export interface FetchWiringPageParams {
   languageCode: string;
   title: string;
   market: string;
-  // booktitle: string;
 }
 
 export default async function fetchSvg(
@@ -35,10 +32,6 @@ export default async function fetchSvg(
       Cookie: cookieString,
     },
   });
-  //console.log(url);
   const svgData = req.data.replace(/xmlns:xlink=\"http:\/\/www.w3.org\/1999\/xlink\"/g, 'xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"');
   return svgData;
-  //await browserPage.goto(url, {
-  //  waitUntil: "networkidle",
-  //});
 }

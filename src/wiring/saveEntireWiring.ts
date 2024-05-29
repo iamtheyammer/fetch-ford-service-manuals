@@ -8,14 +8,11 @@ import fetchBasicPage from "./fetchBasicPage";
 import fetchBasicPageName from "./fetchBasicPageName";
 import saveStream from "../saveStream";
 import { Page } from "playwright";
-
-import fetchPage from "./fetchPage";
 import { FetchManualPageParams } from "../fetchManualPage";
 import fetchPageList from "./fetchPageList";
 import fetchConnectorList from "./fetchConnectorList";
 import fetchConnectorPage from "./fetchConnectorPage";
 import fetchSvg from "./fetchSvg";
-import transformCookieString from "../transformCookieString";
 
 export default async function saveEntireWiring(
   path: string,
@@ -34,7 +31,8 @@ export default async function saveEntireWiring(
     }
   }
 
-  const connectorPath = join(wiringPath, "Connector Views");
+  const connectorViewFolderName = "Connector Views";
+  const connectorPath = join(wiringPath, connectorViewFolderName);
   try {
     await mkdir(connectorPath);
   } catch (e: any) {
@@ -119,8 +117,11 @@ export default async function saveEntireWiring(
     if (doc.Type === "BasicPage") {
       var title: string = sanitizedTitle;
       // For vehicles that use "BasicPage", the connector views can be downloaded in the same manner.
+      // It looks like for older vehicles, the Connector Views might actually be called something like "Connector Faces/Pinout Charts" or something similar
+      // TODO: Suggest changing this if statement to:
+      // if (doc.Maintitle.includes("Connector Views") || doc.Maintitle.includes("Connector Faces"))
       if (doc.Maintitle === "Connector Views") {
-        title = "Connector Views";
+        title = connectorViewFolderName;
       }
 
       // Page lists for "BasicPage" documents is returned as:
@@ -134,6 +135,7 @@ export default async function saveEntireWiring(
       //         "Text": "Page 2"
       //     },
       // ]
+      // For connector views, the "Text" is the name of the connector.
       const pageList = await fetchPageList(
         {
           book: fetchWiringParams.book,
@@ -161,7 +163,7 @@ export default async function saveEntireWiring(
           }
         }
         console.log(
-          `Downloading wiring diagram Section: ${doc.Number} Title: ${doc.Title} Page: ${page} as PDF. `
+          `Downloading wiring diagram Section: ${doc.Number} Title: ${doc.Title} Page: ${page}. `
         );
 
         // Query each filename, because multi-pages are not included in the TOC.

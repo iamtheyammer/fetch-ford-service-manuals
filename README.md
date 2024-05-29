@@ -50,6 +50,10 @@ WSL is a way to run Linux (Ubuntu is recommended for this project) in tandem wit
     - On the left, choose *By Year & Model*, then select your car's year and model.
     - Press GO once selected.
 
+### Set up template files
+1. In templates/ create a copy of cookieString.txt.template named "cookieString.txt" and clear the contents.
+2. In templates/ create a copy of params.json.template named "params.json".
+
 ### **2003 or newer:** Get data for your car
 
 **If your vehicle was made BEFORE 2003, use [these](#2002-or-older-get-data-for-your-car) instructions.**
@@ -59,7 +63,7 @@ This script requires some data about your car that's not available in the PTS GU
 1. Open DevTools, and navigate to the Network tab.
 2. Click on the Workshop tab in PTS.
 3. Filter for the one POST to `https://www.fordservicecontent.com/Ford_Content/PublicationRuntimeRefreshPTS//publication/prod_1_3_372022/TreeAndCover/workshop/32/~WSLL/{some numbers here}`. It should look similar to the request in [this photo](img/workshop-request.png).
-4. Click on that request, and look at the sent form data.
+4. Click on that request, and look at the sent form data (i.e. the payload).
 5. Open [`templates/params.json`](templates/params.json), and copy information from that request into the values of the JSON `.workshop` field.
     - **Do not add fields. Only change values.**
     - Change the values to match. You probably won't need to change anything under the line break.
@@ -83,19 +87,29 @@ This script requires some data about your car that's not available in the PTS GU
 
 ### **All Vehicles:** Get wiring data
 
-1. Clear the DevTools Network pane (click on the trash can or circle with a line through it)
-2. Click the Wiring tab at the top of PTS.
-3. Filter for the GET request to this URL: `https://www.fordservicecontent.com/Ford_Content/PublicationRuntimeRefreshPTS//wiring/TableofContent` (there are query params at the end, that's ok). It should look similar to the request in [this photo](img/wiring-request.png).
-4. Copy the `environment` and `bookType` query params into `.wiring` in `params.json`.
+1. Create a copy of `cookieString.txt.template` called `cookieString.txt` if you haven't already.
+2. Clear the DevTools Network pane (click on the trash can or circle with a line through it)
+3. Go to the Workshop tab in PTS. 
+4. Filter for the one POST to `https://www.fordservicecontent.com/Ford_Content/PublicationRuntimeRefreshPTS//publication/prod_1_3_{datecode}/TreeAndCover/workshop/32/~WSLL/{some numbers here}`.
+5. Go to the request headers and find the "Cookie:" entry.
+6. Open your `cookieString.txt` file, clear the contents, and copy these cookies into the file. There should be 2 cookies: CONTENT_AUTH and CONTENT_PERMISSIONS. Add a semi-colon and space after the CONTENT_PERMISSIONS cookie because we will be adding more cookies in a later step.
+   - Do **not** include the name (`cookieString.txt` should **not** include `Cookie:`, for example.)
+   - NOTE: In Firefox, you MUST enable the *Raw* toggle at the top right of Response Headers, then copy it from there. If you don't, you'll get an invalid character error when trying to fetch wiring diagrams.
+7. Click the Wiring tab at the top of PTS.
+8. Filter for the GET request to this URL: `https://www.fordservicecontent.com/Ford_Content/PublicationRuntimeRefreshPTS//wiring/TableofContent` (there are query params at the end, that's ok). It should look similar to the request in [this photo](img/wiring-request.png).
+9. Copy the `environment`,`bookType`, and `languageCode` query params into `.wiring` in `params.json`.
    - **If your vehicle was made before 2003** (or if `WiringBookTitle` or `WiringBookCode` are missing), you may find these in another request to `https://www.fordtechservice.dealerconnection.com/wiring/TableOfContents` (with some query params at the end):
    - `booktitle` → `WiringBookTitle`
    - `book` → `WiringBookCode`
    - Use these two requests to fill in `params.json` as best as you can.
-5. Save `params.json` and open `cookieString.txt`
-6. Clear the content in `cookieString.txt`, and replace it with the **value** of the `Cookie` header sent in the `TableofContent` request (step 3).
+10. Save `params.json`.
+11. Filter for the GET request to this URL: `https://www.fordtechservice.dealerconnection.com/wiring/TableOfContents` (there are query params at the end, that's ok).
+12. Go to the request headers and find the "Cookie:" entry.
+13. Copy the cookies from this request and append them to the end of your `cookieString.txt` file. 
    - Do **not** include the name (`cookieString.txt` should **not** include `Cookie:`, for example.)
    - NOTE: In Firefox, you MUST enable the *Raw* toggle at the top right of Response Headers, then copy it from there. If you don't, you'll get an invalid character error when trying to fetch wiring diagrams.
-7. Save `cookieString.txt`.
+14. In your `cookieString.txt` file, search for the `ak_bmsc` cookie and remove it.
+15. Save `cookieString.txt`.
 
 ### Download the manual!
 
