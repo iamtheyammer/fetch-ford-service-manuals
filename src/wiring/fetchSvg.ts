@@ -20,7 +20,7 @@ export default async function fetchSvg(
   vehicleId: string,
   wiringBookCode: string,
   languageCode: string,
-  cookieString: string,
+  cookieString: string
 ): Promise<string> {
   const req = await wiringClient({
     method: "GET",
@@ -32,6 +32,9 @@ export default async function fetchSvg(
       Cookie: cookieString,
     },
   });
-  const svgData = req.data.replace(/xmlns:xlink=\"http:\/\/www.w3.org\/1999\/xlink\"/g, 'xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"');
+  const svgData = req.data.replace(
+    /xmlns:xlink=\"http:\/\/www.w3.org\/1999\/xlink\"/g,
+    'xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"'
+  );
   return svgData;
 }

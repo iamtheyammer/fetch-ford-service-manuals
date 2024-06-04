@@ -1,6 +1,6 @@
 import client from "../client";
 
-// TODO: May not work for older vehicles. 1998 Ford Taurus uses a different URL, and is in GIF format instead of PDF: 
+// TODO: May not work for older vehicles. 1998 Ford Taurus uses a different URL, and is in GIF format instead of PDF:
 // https://www.fordservicecontent.com/Ford_Content/pubs/auxf/~WE/USENIE/EWH/EWHCF099.GIF
 export default async function fetchBasicPage(
   filename: string,

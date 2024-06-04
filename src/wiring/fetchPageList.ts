@@ -1,6 +1,5 @@
 import client from "../client";
 
-
 export interface FetchWiringPageList {
   book: string;
   cell: string;
@@ -11,7 +10,6 @@ export interface FetchWiringPageList {
   contentlanguage: string;
   languageCode: string;
 }
-
 
 export default async function fetchPageList(
   params: FetchWiringPageList,

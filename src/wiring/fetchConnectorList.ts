@@ -31,6 +31,6 @@ export default async function fetchConnectorList(
       Cookie: cookieString,
     },
   });
-  
+
   return req.data;
 }

@@ -52,5 +52,8 @@ export default async function fetchConnectorPage(
   await browserPage.pdf({
     path: join(pdfSavePath, `${connectorName}.pdf`),
   });
-  await writeFile(join(htmlSavePath, `${connectorName}.html`), await browserPage.content());
+  await writeFile(
+    join(htmlSavePath, `${connectorName}.html`),
+    await browserPage.content()
+  );
 }

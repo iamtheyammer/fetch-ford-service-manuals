@@ -64,7 +64,7 @@ export default async function saveEntireWiring(
           bookType: fetchWiringParams.bookType,
           contentmarket: fetchWiringParams.contentmarket,
           contentlanguage: fetchManualParams.contentlanguage,
-          languageCode: fetchWiringParams.languageCode
+          languageCode: fetchWiringParams.languageCode,
         },
         cookieString
       );
@@ -95,21 +95,23 @@ export default async function saveEntireWiring(
           fetchManualParams.vehicleId,
           fetchManualParams.WiringBookCode,
           fetchWiringParams.languageCode,
-          cookieString,
+          cookieString
         );
 
         // If the width/height are not specified when converting to png, the image ends up very small.
         // Read the width/height from the viewbox of the svg so we can preserve the original size.
-        const svgParsed = new JSDOM(svgData, 'image/svg+xml').window.document;
-        const viewBox = svgParsed.getElementById("svgDoc").getAttribute("viewBox");
+        const svgParsed = new JSDOM(svgData, "image/svg+xml").window.document;
+        const viewBox = svgParsed
+          .getElementById("svgDoc")
+          .getAttribute("viewBox");
         // viewbox is "x y width height"
-        const width = viewBox.split(' ')[2];
-        const height = viewBox.split(' ')[3];
+        const width = viewBox.split(" ")[2];
+        const height = viewBox.split(" ")[3];
         const image = await svgToImg.from(svgData).toPng({
           path: newTitle,
-          background: 'white',
+          background: "white",
           height: height,
-          width: width
+          width: width,
         });
       }
     }
@@ -145,7 +147,7 @@ export default async function saveEntireWiring(
           bookType: fetchWiringParams.bookType,
           contentmarket: fetchWiringParams.contentmarket,
           contentlanguage: fetchManualParams.contentlanguage,
-          languageCode: fetchWiringParams.languageCode
+          languageCode: fetchWiringParams.languageCode,
         },
         cookieString
       );
@@ -189,7 +191,12 @@ export default async function saveEntireWiring(
 
         await saveStream(
           docStream,
-          join(sectionPath, `${title} - ${pageText}${doc.Filename.slice(doc.Filename.indexOf("."))}`)
+          join(
+            sectionPath,
+            `${title} - ${pageText}${doc.Filename.slice(
+              doc.Filename.indexOf(".")
+            )}`
+          )
         );
       }
     }
@@ -202,13 +209,16 @@ export default async function saveEntireWiring(
           bookType: fetchWiringParams.bookType,
           contentmarket: fetchWiringParams.contentmarket,
           contentlanguage: fetchManualParams.contentlanguage,
-          languageCode: fetchWiringParams.languageCode
+          languageCode: fetchWiringParams.languageCode,
         },
         cookieString
       );
       for (let k = 0; k < connectorList.length; k++) {
         const connector = connectorList[k];
-        const connectorTitle = `${connector.Name} - ${connector.Desc.replace(/\//g, '')}`;
+        const connectorTitle = `${connector.Name} - ${connector.Desc.replace(
+          /\//g,
+          ""
+        )}`;
         console.log(
           `Downloading Connector Face diagram section: ${connector.Name} as PDF and HTML. `
         );
