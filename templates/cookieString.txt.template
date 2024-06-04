@@ -12,4 +12,3 @@
 	bm_mi
 	bm_sv
 	PTSSession
-4. Ensure the cookie string does not contain the ak_bmsc cookie

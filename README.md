@@ -92,7 +92,7 @@ This script requires some data about your car that's not available in the PTS GU
 3. Go to the Workshop tab in PTS. 
 4. Filter for the one POST to `https://www.fordservicecontent.com/Ford_Content/PublicationRuntimeRefreshPTS//publication/prod_1_3_{datecode}/TreeAndCover/workshop/32/~WSLL/{some numbers here}`.
 5. Go to the request headers and find the "Cookie:" entry.
-6. Open your `cookieString.txt` file, clear the contents, and copy these cookies into the file. There should be 2 cookies: CONTENT_AUTH and CONTENT_PERMISSIONS. Add a semi-colon and space after the CONTENT_PERMISSIONS cookie because we will be adding more cookies in a later step.
+6. Open your `cookieString.txt` file, clear the contents, and copy these cookies into the file. Add a semi-colon and space at the end of the file because we will be adding more cookies in a later step.
    - Do **not** include the name (`cookieString.txt` should **not** include `Cookie:`, for example.)
    - NOTE: In Firefox, you MUST enable the *Raw* toggle at the top right of Response Headers, then copy it from there. If you don't, you'll get an invalid character error when trying to fetch wiring diagrams.
 7. Click the Wiring tab at the top of PTS.
@@ -108,8 +108,7 @@ This script requires some data about your car that's not available in the PTS GU
 13. Copy the cookies from this request and append them to the end of your `cookieString.txt` file. 
    - Do **not** include the name (`cookieString.txt` should **not** include `Cookie:`, for example.)
    - NOTE: In Firefox, you MUST enable the *Raw* toggle at the top right of Response Headers, then copy it from there. If you don't, you'll get an invalid character error when trying to fetch wiring diagrams.
-14. In your `cookieString.txt` file, search for the `ak_bmsc` cookie and remove it.
-15. Save `cookieString.txt`.
+14. Save `cookieString.txt`.
 
 ### Download the manual!
 
