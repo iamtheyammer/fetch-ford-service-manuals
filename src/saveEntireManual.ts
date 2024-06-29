@@ -5,7 +5,7 @@ import client from "./client";
 import { Page } from "playwright";
 import saveStream from "./saveStream";
 import { CLIArgs } from "./processCLIArgs";
-import { fileExists, sanitizeName } from "./utils";
+import { fileExists, getHtmlUrl, sanitizeName } from "./utils";
 
 export type SaveOptions = Pick<CLIArgs, "saveHTML" | "ignoreSaveErrors">;
 
@@ -124,7 +124,7 @@ export async function saveHTMLAsPDF(
   pdfPath: string,
   page: Page
 ): Promise<void> {
-  await page.setContent(htmlContent, { waitUntil: "load" });
+  await page.goto(getHtmlUrl(htmlContent), { waitUntil: "load" });
   await page.pdf({
     path: pdfPath,
   });

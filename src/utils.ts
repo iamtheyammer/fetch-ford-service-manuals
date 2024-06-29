@@ -33,3 +33,11 @@ export const sanitizeName = (name: string): string =>
  */
 export const getSvgUrl = (svg: string): string =>
   `data:image/svg+xml;base64,${Buffer.from(svg).toString("base64")}`;
+
+/**
+ * Convert an HTML string to a data URL that
+ * can be browsed to with page.goto(getHtmlUrl(html))
+ * @param html HTML string to convert to a data URL
+ */
+export const getHtmlUrl = (html: string): string =>
+  `data:text/html;base64,${Buffer.from(html).toString("base64")}`;

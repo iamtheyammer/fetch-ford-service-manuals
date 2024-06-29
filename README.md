@@ -130,6 +130,25 @@ This bot downloads the **entire** workshop manual and **all** wiring diagrams fo
 
 Wiring diagrams will be in `outputpath/Wiring`. There's also a `toc.json` file with the table of contents for the wiring diagrams.
 
+#### Connector Views & Component Location Charts (~2006 or newer)
+
+If you have a `Wiring/Connector Views` folder, you've got a special file in there: `Connectors.csv`.
+It tells you where to find every connector in the car, and where it is in the Component Location Charts.
+Open it in Excel or Google Sheets to see the data. Here's a quick example:
+
+| Connector ID | Connector                            | Connector Location Views Page Number | Grid Reference | Location in Vehicle |
+|--------------|--------------------------------------|--------------------------------------|----------------|---------------------|
+| C168A        | 10R80 Transmission (2.7L)            | 29                                   | F5             | Transmission        |
+| C1840        | Line Pressure Control (LPC) solenoid | 34                                   | E8             | Inside transmission |
+
+- Connector ID is the ID of the connector in the wiring diagrams.
+- Connector is a description of the connector.
+- Connector Location Views Page Number is the page number in the Connector Location Views section of the manual.
+  (`Wiring/Connector Location Views`)
+- Grid Reference is the grid reference on that page. You'll see a grid with letters on the side and numbers on the top.
+  Use the letter as the row and the number as the column to find connectors.
+- Location in Vehicle is a simple description of where the connector is in the vehicle.
+
 ### **2003 or newer:** Workshop manual
 
 The folder structure in the output directory will mimic the structure on PTS, so if a file has a path like `1: General Information -> 00: Service Information -> 100-00 General Information -> About this Manual`, it will be in the folder `outputpath/1: General Information/00: Service Information/100-00 General Information/About this Manual.pdf`.
@@ -174,6 +193,8 @@ All the ones I've tested. Just for fun, I tried:
 All worked flawlessly!
 
 ### How can I support this project?
+
+As Ford continues to change how manuals are accessed, this project requires continuous maintenance.
 
 If this project was helpful to you, you can support this project on GitHub sponsors (click the "Sponsor" button at the top of the page), [buy me a coffee](https://buymeacoffee.com/iamtheyammer), or just share it!
 

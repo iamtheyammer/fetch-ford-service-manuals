@@ -117,7 +117,6 @@ export default function transformCookieString(cookieString: string): {
   });
 
   return {
-    // transformedCookies: cookies.concat(contentCookies),
     transformedCookies: domainedCookies,
     processedCookieString: cookies
       .map((c) => `${c.name}=${c.value}`)
