@@ -6,9 +6,9 @@ import {
   WiringTableOfContentsEntry,
 } from "./fetchTableOfContents";
 import fetchSvg from "./fetchSvg";
-import { join } from "path";
+import { join, resolve } from "path";
 import { writeFile } from "fs/promises";
-import { getSvgUrl, sanitizeName } from "../utils";
+import { sanitizeName } from "../utils";
 import fetchBasicPage from "./fetchBasicPage";
 
 export interface WiringFetchPageParams extends WiringFetchParams {
@@ -89,7 +89,9 @@ export default async function savePage(
 
     // Print as PDF
     const pdfPath = join(folderPath, `${title}.pdf`);
-    await browserPage.goto(getSvgUrl(svgString));
+
+    // can't use getSvgUrl here because the SVG is too big
+    await browserPage.goto(`file:///${resolve(svgPath)}`);
     await browserPage.pdf({
       path: pdfPath,
       landscape: true,
