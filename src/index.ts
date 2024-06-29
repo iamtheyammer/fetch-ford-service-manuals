@@ -92,6 +92,8 @@ async function run({
       console.error("Failed to log in with the provided cookies.");
       process.exit(1);
     }
+
+    await cookieTestingContext.close();
   }
 
   if (doWorkshopDownload) {
@@ -149,6 +151,7 @@ async function run({
       book: config.workshop.WiringBookCode,
       contentlanguage: config.workshop.contentlanguage,
       contentmarket: config.workshop.contentmarket,
+      languageCode: config.workshop.languageOdysseyCode,
     };
 
     console.log("Fetching wiring table of contents...");
