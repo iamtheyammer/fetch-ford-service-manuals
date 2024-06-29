@@ -1,4 +1,5 @@
 import axios from "axios";
+import { useProxy } from "./utils";
 
 const client = axios.create({
   headers: {
@@ -15,10 +16,13 @@ const client = axios.create({
     "Sec-Fetch-Site": "cross-site",
     "Sec-GPC": "1",
   },
-  // proxy: {
-  //   host: "localhost",
-  //   port: 8888,
-  // },
+  proxy: useProxy
+    ? {
+        protocol: "http",
+        host: "localhost",
+        port: 8888,
+      }
+    : false,
 });
 
 export default client;

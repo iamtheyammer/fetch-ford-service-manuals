@@ -1,11 +1,11 @@
-import { mkdir, writeFile, access } from "fs/promises";
+import { mkdir, writeFile } from "fs/promises";
 import { join, resolve } from "path";
 import fetchManualPage, { FetchManualPageParams } from "./fetchManualPage";
 import client from "./client";
 import { Page } from "playwright";
 import saveStream from "./saveStream";
 import { CLIArgs } from "./processCLIArgs";
-import { fileExists, getHtmlUrl, sanitizeName } from "./utils";
+import { sanitizeName } from "./utils";
 
 export type SaveOptions = Pick<CLIArgs, "saveHTML" | "ignoreSaveErrors">;
 
@@ -124,7 +124,7 @@ export async function saveHTMLAsPDF(
   pdfPath: string,
   page: Page
 ): Promise<void> {
-  await page.goto(getHtmlUrl(htmlContent), { waitUntil: "load" });
+  await page.setContent(htmlContent, { waitUntil: "domcontentloaded" });
   await page.pdf({
     path: pdfPath,
   });

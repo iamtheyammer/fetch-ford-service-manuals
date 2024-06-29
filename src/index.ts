@@ -7,7 +7,7 @@ import fetchTableOfContents, {
 } from "./wiring/fetchTableOfContents";
 import saveEntireWiring from "./wiring/saveEntireWiring";
 import transformCookieString from "./transformCookieString";
-import { chromium, Page } from "playwright";
+import { chromium, Page, BrowserContextOptions } from "playwright";
 import { join } from "path";
 import saveEntireManual from "./saveEntireManual";
 import readConfig, { Config } from "./readConfig";
@@ -15,6 +15,7 @@ import processCLIArgs, { CLIArgs } from "./processCLIArgs";
 import fetchPre2003AlphabeticalIndex from "./pre-2003/fetchAlphabeticalIndex";
 import saveEntirePre2003AlphabeticalIndex from "./pre-2003/saveEntireAlphabeticalIndex";
 import client from "./client";
+import { useProxy } from "./utils";
 
 async function run({
   configPath,
@@ -54,12 +55,16 @@ async function run({
     // fix getting wiring SVGs
     args: ["--disable-web-security"],
     headless: !(process.env.HEADLESS_BROWSER === "false"),
-    // proxy: { server: "localhost:8888" },
+    proxy: useProxy ? { server: "localhost:8888" } : undefined,
   });
 
-  const defaultContextParams = {
+  const defaultContextParams: BrowserContextOptions = {
     userAgent:
       "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36",
+    extraHTTPHeaders: {
+      // without this, Playwright will put "HeadlessChrome" in here and PTS will reject the request
+      "Sec-Ch-Ua": '"Not/A)Brand";v="24", "Chromium";v="99"',
+    },
   };
 
   if (doCookieTest) {
