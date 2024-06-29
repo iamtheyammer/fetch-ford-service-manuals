@@ -7,6 +7,8 @@ export interface CLIArgs {
   cookiePath: string;
   doWorkshopDownload: boolean;
   doWiringDownload: boolean;
+  doParamsValidation: boolean;
+  doCookieTest: boolean;
   saveHTML: boolean;
   ignoreSaveErrors: boolean;
 }
@@ -35,6 +37,16 @@ export default function processCLIArgs(): CLIArgs {
     },
     {
       name: "noWiring",
+      type: Boolean,
+      default: false,
+    },
+    {
+      name: "noParamsValidation",
+      type: Boolean,
+      default: false,
+    },
+    {
+      name: "noCookieTest",
       type: Boolean,
       default: false,
     },
@@ -92,6 +104,17 @@ export default function processCLIArgs(): CLIArgs {
           description: "Skip downloading the Wiring Diagrams.",
         },
         {
+          name: "noParamsValidation",
+          typeLabel: " ",
+          description: "Skip validating the configFile.",
+        },
+        {
+          name: "noCookieTest",
+          typeLabel: " ",
+          description:
+            "Skip trying to log into PTS before downloading manuals.",
+        },
+        {
           name: "saveHTML",
           typeLabel: " ",
           description:
@@ -133,6 +156,8 @@ export default function processCLIArgs(): CLIArgs {
       cookiePath: options.cookieString,
       doWorkshopDownload: !options.noWorkshop,
       doWiringDownload: !options.noWiring,
+      doParamsValidation: !options.noParamsValidation,
+      doCookieTest: !options.noCookieTest,
       saveHTML: !!options.saveHTML,
       ignoreSaveErrors: !!options.ignoreSaveErrors,
     };

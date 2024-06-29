@@ -22,9 +22,11 @@ async function run({
   cookiePath,
   doWorkshopDownload,
   doWiringDownload,
+  doParamsValidation,
+  doCookieTest,
   ...restArgs
 }: CLIArgs) {
-  const config = await readConfig(configPath);
+  const config = await readConfig(configPath, doParamsValidation);
 
   // create output dir
   try {
@@ -55,13 +57,45 @@ async function run({
     proxy: { server: "localhost:8888" },
   });
 
-  const workshopContextParams = {
+  const defaultContextParams = {
     userAgent:
       "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36",
   };
 
+  if (doCookieTest) {
+    console.log("Attempting to log into PTS...");
+    const cookieTestingContext = await browser.newContext(defaultContextParams);
+    await cookieTestingContext.addCookies(transformedCookies);
+    const cookieTestingPage = await cookieTestingContext.newPage();
+    await cookieTestingPage.goto(
+      "https://www.fordtechservice.dealerconnection.com",
+      { waitUntil: "load" }
+    );
+    if (cookieTestingPage.url().includes("subscriptionExpired")) {
+      console.error(
+        "Looks like your PTS subscription has expired. " +
+          "Re-subscribe to download manuals. If you just want to download a workshop manual, " +
+          "you may be able to do so without re-subscribing: run the script with --noCookieTest."
+      );
+      const expiryDate = await cookieTestingPage.evaluate(
+        'document.querySelector("#pts-page > ul > li > b")?.innerText?.trim()'
+      );
+      if (expiryDate) {
+        console.error(expiryDate);
+      }
+      process.exit(1);
+    } else if (
+      !cookieTestingPage
+        .url()
+        .startsWith("https://www.fordtechservice.dealerconnection.com")
+    ) {
+      console.error("Failed to log in with the provided cookies.");
+      process.exit(1);
+    }
+  }
+
   if (doWorkshopDownload) {
-    const workshopContext = await browser.newContext(workshopContextParams);
+    const workshopContext = await browser.newContext(defaultContextParams);
 
     if (parseInt(config.workshop.modelYear) >= 2003) {
       const browserPage = await workshopContext.newPage();
@@ -105,7 +139,7 @@ async function run({
     console.log("Saving wiring manual...");
 
     const wiringContext = await browser.newContext({
-      ...workshopContextParams,
+      ...defaultContextParams,
     });
     await wiringContext.addCookies(transformedCookies);
     const wiringPage = await wiringContext.newPage();
