@@ -21,7 +21,7 @@ export default async function saveEntireManual(
   for (let i = 0; i < exploded.length; i++) {
     const [name, docID] = exploded[i];
 
-    if (typeof docID === "string") {
+    if (typeof docID === "string" && docID.length > 0) {
       // download and save document
       if (docID.startsWith("http") && docID.includes(".pdf")) {
         console.log(`Downloading manual PDF ${name} ${docID}`);
