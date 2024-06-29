@@ -54,7 +54,7 @@ async function run({
     // fix getting wiring SVGs
     args: ["--disable-web-security"],
     headless: !(process.env.HEADLESS_BROWSER === "false"),
-    proxy: { server: "localhost:8888" },
+    // proxy: { server: "localhost:8888" },
   });
 
   const defaultContextParams = {
