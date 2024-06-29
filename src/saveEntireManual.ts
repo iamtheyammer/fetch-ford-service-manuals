@@ -76,11 +76,15 @@ export default async function saveEntireManual(
           await writeFile(htmlPath, pageHTML);
         }
 
-        await saveHTMLAsPDF(
-          pageHTML,
-          join(path, `/${filename}.pdf`),
-          browserPage
+        await browserPage.setContent(pageHTML, { waitUntil: "load" });
+        // removes this little color-coded thing that doesn't load properly
+        // in Playwright, just says "Workshop Manual Graphics Training"...
+        await browserPage.evaluate(
+          'document.querySelectorAll("body > div > table > tbody > tr > td:nth-child(2)").forEach(e => e.remove())'
         );
+        await browserPage.pdf({
+          path: join(path, `/${filename}.pdf`),
+        });
       } catch (e) {
         if (options.ignoreSaveErrors) {
           console.error(
@@ -117,17 +121,6 @@ export default async function saveEntireManual(
       );
     }
   }
-}
-
-export async function saveHTMLAsPDF(
-  htmlContent: string,
-  pdfPath: string,
-  page: Page
-): Promise<void> {
-  await page.setContent(htmlContent, { waitUntil: "domcontentloaded" });
-  await page.pdf({
-    path: pdfPath,
-  });
 }
 
 // export async function saveURLAsPDF(
