@@ -6,6 +6,7 @@ export interface Config {
   wiring: {
     environment: string;
     bookType: string;
+    languageCode: string;
   };
   pre_2003: {
     alphabeticalIndexURL: string;

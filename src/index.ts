@@ -3,7 +3,7 @@ import fetchTreeAndCover, {
   FetchTreeAndCoverParams,
 } from "./fetchTreeAndCover";
 import fetchTableOfContents, {
-  FetchWiringTableOfContents,
+  WiringFetchParams,
 } from "./wiring/fetchTableOfContents";
 import saveEntireWiring from "./wiring/saveEntireWiring";
 import transformCookieString from "./transformCookieString";
@@ -14,11 +14,14 @@ import readConfig, { Config } from "./readConfig";
 import processCLIArgs, { CLIArgs } from "./processCLIArgs";
 import fetchPre2003AlphabeticalIndex from "./pre-2003/fetchAlphabeticalIndex";
 import saveEntirePre2003AlphabeticalIndex from "./pre-2003/saveEntireAlphabeticalIndex";
+import client from "./client";
 
 async function run({
   configPath,
   outputPath,
   cookiePath,
+  doWorkshopDownload,
+  doWiringDownload,
   ...restArgs
 }: CLIArgs) {
   const config = await readConfig(configPath);
@@ -34,100 +37,102 @@ async function run({
   }
 
   console.log("Processing cookies...");
-  const cookieString = (
+  const rawCookieString = (
     await readFile(cookiePath, { encoding: "utf-8" })
   ).trim();
-  const transformedCookieString = transformCookieString(cookieString);
+  const { transformedCookies, processedCookieString } =
+    transformCookieString(rawCookieString);
+
+  // Add the cookie string to the Axios client
+  // It'll be sent with every request automatically
+  client.defaults.headers.Cookie = processedCookieString;
 
   console.log("Creating a headless chromium instance...");
   const browser = await chromium.launch({
     // fix getting wiring SVGs
     args: ["--disable-web-security"],
-    headless: true,
+    headless: !(process.env.HEADLESS_BROWSER === "false"),
+    proxy: { server: "localhost:8888" },
   });
 
   const workshopContextParams = {
     userAgent:
       "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36",
   };
-  const workshopContext = await browser.newContext(workshopContextParams);
 
-  if (parseInt(config.workshop.modelYear) >= 2003) {
-    const browserPage = await workshopContext.newPage();
-    await browserPage.route("FordEcat.jpg", (route) => route.abort());
+  if (doWorkshopDownload) {
+    const workshopContext = await browser.newContext(workshopContextParams);
 
-    await modernWorkshop(config, outputPath, browserPage, restArgs);
-  } else {
-    console.log(
-      "Downloading pre-2003 workshop manual, please see README for details..."
-    );
+    if (parseInt(config.workshop.modelYear) >= 2003) {
+      const browserPage = await workshopContext.newPage();
+      await browserPage.route("FordEcat.jpg", (route) => route.abort());
 
-    if (
-      config.pre_2003.alphabeticalIndexURL ===
-      "https://www.fordservicecontent.com/pubs/content/....."
-    ) {
-      console.error(
-        "Please set the URL for the pre-2003 alphabetical index in the config file."
+      await modernWorkshop(config, outputPath, browserPage, restArgs);
+    } else {
+      console.log(
+        "Downloading pre-2003 workshop manual, please see README for details..."
       );
-      process.exit(1);
+
+      if (
+        config.pre_2003.alphabeticalIndexURL ===
+        "https://www.fordservicecontent.com/pubs/content/....."
+      ) {
+        console.error(
+          "Please set the URL for the pre-2003 alphabetical index in the config file."
+        );
+        process.exit(1);
+      }
+
+      await workshopContext.addCookies(transformedCookies);
+      const browserPage = await workshopContext.newPage();
+
+      await pre2003Workshop(
+        config,
+        outputPath,
+        rawCookieString,
+        browserPage,
+        restArgs
+      );
     }
 
-    await workshopContext.addCookies(transformedCookieString);
-    const browserPage = await workshopContext.newPage();
-
-    await pre2003Workshop(
-      config,
-      outputPath,
-      cookieString,
-      browserPage,
-      restArgs
-    );
+    console.log("Saved workshop manual!");
+    await workshopContext.close();
+  } else {
+    console.log("Skipping workshop manual download.");
   }
 
-  console.log("Saved workshop manual!");
-  await workshopContext.close();
+  if (doWiringDownload) {
+    console.log("Saving wiring manual...");
 
-  console.log("Saving wiring manual...");
+    const wiringContext = await browser.newContext({
+      ...workshopContextParams,
+    });
+    await wiringContext.addCookies(transformedCookies);
+    const wiringPage = await wiringContext.newPage();
 
-  const wiringContext = await browser.newContext({
-    ...workshopContextParams,
-    viewport: {
-      width: 2560,
-      height: 1440,
-    },
-  });
-  await wiringContext.addCookies(transformedCookieString);
-  const wiringPage = await wiringContext.newPage();
+    const wiringParams: WiringFetchParams = {
+      ...config.wiring,
+      book: config.workshop.WiringBookCode,
+      contentlanguage: config.workshop.contentlanguage,
+      contentmarket: config.workshop.contentmarket,
+    };
 
-  // wiringPage.on("requestfinished", async resp => {
-  //   if(!resp.url().includes(".svg")) return;
-  //   const respData = await resp.allHeaders()
-  //   console.log(resp.url());
-  //   console.log(respData);
-  //   const response = await resp.response();
-  //   console.log((await response!.body()).toString())
-  // })
-  // wiringPage.on("console", console.log)
+    console.log("Fetching wiring table of contents...");
 
-  const wiringParams: FetchWiringTableOfContents = {
-    ...config.wiring,
-    book: config.workshop.WiringBookCode,
-    contentlanguage: config.workshop.contentlanguage,
-    contentmarket: config.workshop.contentmarket,
-  };
+    const wiringToC = await fetchTableOfContents(wiringParams);
 
-  const wiringToC = await fetchTableOfContents(wiringParams, cookieString);
+    await saveEntireWiring(
+      outputPath,
+      config.workshop,
+      wiringParams,
+      wiringToC,
+      wiringPage
+    );
 
-  await saveEntireWiring(
-    outputPath,
-    config.workshop,
-    wiringParams,
-    wiringToC,
-    cookieString,
-    wiringPage
-  );
-
-  await wiringContext.close();
+    await wiringContext.close();
+  } else {
+    console.log("Skipping wiring manual download.");
+  }
 
   console.log("Manual downloaded, closing browser");
   await browser.close();
@@ -201,4 +206,4 @@ async function pre2003Workshop(
 }
 
 const args = processCLIArgs();
-run(args);
+run(args).then(() => process.exit(0));
