@@ -1,17 +1,4 @@
-import wiringClient from "./wiringClient";
-
-export interface FetchWiringPageParams {
-  book: string;
-  vehicleId: string;
-  cell: string;
-  page: string;
-  country: string;
-  bookType: string;
-  language: string;
-  languageCode: string;
-  title: string;
-  market: string;
-}
+import client from "../client";
 
 export default async function fetchSvg(
   docNumber: string,
@@ -19,22 +6,16 @@ export default async function fetchSvg(
   environment: string,
   vehicleId: string,
   wiringBookCode: string,
-  languageCode: string,
-  cookieString: string
+  languageCode: string
 ): Promise<string> {
-  const req = await wiringClient({
+  const req = await client({
     method: "GET",
-    url: `https://www.fordservicecontent.com/ford_content/PublicationRuntimeRefreshPTS/wiring/svg/${environment}/${vehicleId}/~W${wiringBookCode}/${languageCode}/svg/${docNumber}/0/${pageNumber}.svg`,
+    url: `https://www.fordservicecontent.com/ford_content/PublicationRuntimeRefreshPTS/wiring/svg/${environment}/${vehicleId}/~W${wiringBookCode}/${languageCode}/svg/${docNumber}/0/${parseInt(
+      pageNumber
+    )}.svg`,
     params: {
       fromPageBase: "https://www.fordtechservice.dealerconnection.com",
     },
-    headers: {
-      Cookie: cookieString,
-    },
   });
-  const svgData = req.data.replace(
-    /xmlns:xlink=\"http:\/\/www.w3.org\/1999\/xlink\"/g,
-    'xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"'
-  );
-  return svgData;
+  return req.data;
 }

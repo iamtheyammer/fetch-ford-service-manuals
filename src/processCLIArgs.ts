@@ -5,6 +5,8 @@ export interface CLIArgs {
   configPath: string;
   outputPath: string;
   cookiePath: string;
+  doWorkshopDownload: boolean;
+  doWiringDownload: boolean;
   saveHTML: boolean;
   ignoreSaveErrors: boolean;
 }
@@ -25,6 +27,16 @@ export default function processCLIArgs(): CLIArgs {
       name: "outputPath",
       alias: "o",
       type: String,
+    },
+    {
+      name: "noWorkshop",
+      type: Boolean,
+      default: false,
+    },
+    {
+      name: "noWiring",
+      type: Boolean,
+      default: false,
     },
     {
       name: "saveHTML",
@@ -70,6 +82,16 @@ export default function processCLIArgs(): CLIArgs {
             "{bold Required.} Directory where you'd like the manual to download to. Should be an empty directory.",
         },
         {
+          name: "noWorkshop",
+          typeLabel: " ",
+          description: "Skip downloading the Workshop Manual.",
+        },
+        {
+          name: "noWiring",
+          typeLabel: " ",
+          description: "Skip downloading the Wiring Diagrams.",
+        },
+        {
           name: "saveHTML",
           typeLabel: " ",
           description:
@@ -109,6 +131,8 @@ export default function processCLIArgs(): CLIArgs {
       configPath: options.configFile,
       outputPath: options.outputPath,
       cookiePath: options.cookieString,
+      doWorkshopDownload: !options.noWorkshop,
+      doWiringDownload: !options.noWiring,
       saveHTML: !!options.saveHTML,
       ignoreSaveErrors: !!options.ignoreSaveErrors,
     };

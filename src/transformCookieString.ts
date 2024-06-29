@@ -1,8 +1,10 @@
 interface TransformedCookie {
   name: string;
   value: string;
-  url: string;
+  domain: string;
+  path: string;
   sameSite: "None";
+  secure: boolean;
 }
 
 // prohibitedCookies will be removed during parsing
@@ -14,30 +16,58 @@ const expectedCookies: { [cookieName: string]: boolean } = {
   CONTENT_PERMISSIONS: false,
   dtCookie: false,
   "Ford.TSO.PTSSuite": false,
-  "TPS%2DPERM": false,
   PREFERENCES: false,
-  "TPS%2DMEMBERSHIP": false,
   AKA_A2: false,
   bm_mi: false,
   bm_sv: false,
   PTSSession: false,
+  "TPS%2DMEMBERSHIP": false,
+  "TPS%2DPERM": false,
 };
 
-export default function transformCookieString(
-  cookieString: string
-): TransformedCookie[] {
+// Cookie domain constants, prevents typos
+const WWW_FORDTECHSERVICE_DEALERCONNECTION_COM =
+  ".www.fordtechservice.dealerconnection.com";
+const FORDTECHSERVICE_DEALERCONNECTION_COM =
+  ".fordtechservice.dealerconnection.com";
+const FORDSERVICECONTENT_COM = ".fordservicecontent.com";
+const DEALERCONNECTION_COM = ".dealerconnection.com";
+
+const cookieDomains: { [cookieName: string]: string[] } = {
+  AKA_A2: [FORDTECHSERVICE_DEALERCONNECTION_COM, FORDSERVICECONTENT_COM],
+  CONTENT_AUTH: [FORDSERVICECONTENT_COM],
+  CONTENT_PERMISSIONS: [FORDSERVICECONTENT_COM],
+  FeaturesAttributes: [FORDTECHSERVICE_DEALERCONNECTION_COM],
+  "Ford.TSO.PTSSuite": [WWW_FORDTECHSERVICE_DEALERCONNECTION_COM],
+  PERSISTENT: [FORDTECHSERVICE_DEALERCONNECTION_COM],
+  PREFERENCES: [FORDTECHSERVICE_DEALERCONNECTION_COM],
+  PTSSession: [WWW_FORDTECHSERVICE_DEALERCONNECTION_COM],
+  "TPS%2DMEMBERSHIP": [FORDTECHSERVICE_DEALERCONNECTION_COM],
+  "TPS%2DPERM": [FORDTECHSERVICE_DEALERCONNECTION_COM],
+  bm_mi: [FORDTECHSERVICE_DEALERCONNECTION_COM, FORDSERVICECONTENT_COM],
+  bm_sv: [FORDTECHSERVICE_DEALERCONNECTION_COM],
+  dtCookie: [DEALERCONNECTION_COM, FORDSERVICECONTENT_COM],
+};
+
+export default function transformCookieString(cookieString: string): {
+  transformedCookies: TransformedCookie[];
+  processedCookieString: string;
+} {
   const pairs = cookieString
     .split(";")
-    .map((c: string) => c.trim().split("=").map(decodeURIComponent))
-    .reduce(function (a, b) {
+    .map((c: string) => c.trim().split("="))
+    .reduce((a, b) => {
+      // Skip prohibited cookies
       if (prohibitedCookies.has(b[0])) {
         return a;
       }
 
-      if (expectedCookies[b[0]]) {
+      // Mark expected cookies as found
+      if (expectedCookies[b[0]] === false) {
         expectedCookies[b[0]] = true;
       }
 
+      // Store cookie
       a[b[0]] = b.slice(1).join("=");
       return a;
     }, {} as { [cookie: string]: string });
@@ -46,19 +76,37 @@ export default function transformCookieString(
     ([name, value]): TransformedCookie => ({
       name,
       value: value as string,
-      url: "https://www.fordtechservice.dealerconnection.com",
+      domain: FORDTECHSERVICE_DEALERCONNECTION_COM,
+      path: "/",
       sameSite: "None",
+      secure: true,
     })
   );
 
-  const contentCookies = Object.entries(pairs).map(
-    ([name, value]): TransformedCookie => ({
-      name,
-      value: value as string,
-      url: "https://www.fordservicecontent.com",
-      sameSite: "None",
-    })
-  );
+  const domainedCookies: TransformedCookie[] = [];
+
+  for (const cookie of cookies) {
+    if (cookieDomains[cookie.name]) {
+      cookieDomains[cookie.name].forEach((domain) => {
+        domainedCookies.push({
+          ...cookie,
+          domain,
+          // path: "/"
+        });
+      });
+    } else {
+      domainedCookies.push({
+        ...cookie,
+        domain: FORDSERVICECONTENT_COM,
+        // path: "/"
+      });
+      domainedCookies.push({
+        ...cookie,
+        domain: DEALERCONNECTION_COM,
+        // path: "/"
+      });
+    }
+  }
 
   Object.entries(expectedCookies).forEach(([name, exists]) => {
     if (!exists) {
@@ -68,5 +116,11 @@ export default function transformCookieString(
     }
   });
 
-  return cookies.concat(contentCookies);
+  return {
+    // transformedCookies: cookies.concat(contentCookies),
+    transformedCookies: domainedCookies,
+    processedCookieString: cookies
+      .map((c) => `${c.name}=${c.value}`)
+      .join("; "),
+  };
 }

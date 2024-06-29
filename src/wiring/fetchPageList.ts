@@ -1,20 +1,22 @@
 import client from "../client";
+import { WiringFetchParams } from "./fetchTableOfContents";
 
-export interface FetchWiringPageList {
-  book: string;
-  cell: string;
+export interface FetchWiringPageListParams extends WiringFetchParams {
+  cell: string | number;
   title: string;
-  page: string;
-  bookType: string;
-  contentmarket: string;
-  contentlanguage: string;
-  languageCode: string;
+  page: string | number;
 }
 
-export default async function fetchPageList(
-  params: FetchWiringPageList,
-  cookieString: string
-): Promise<any> {
+export interface BasicPagePageListItem {
+  // Page number
+  Value: string;
+  // Page title
+  Text: string;
+}
+
+async function fetchPageList(
+  params: FetchWiringPageListParams
+): Promise<string[] | BasicPagePageListItem[]> {
   const req = await client({
     method: "GET",
     url: "https://www.fordservicecontent.com/Ford_Content/PublicationRuntimeRefreshPTS//wiring/PageList",
@@ -22,9 +24,8 @@ export default async function fetchPageList(
       ...params,
       fromPageBase: "https://www.fordtechservice.dealerconnection.com",
     },
-    headers: {
-      Cookie: cookieString,
-    },
   });
   return req.data;
 }
+
+export default fetchPageList;

@@ -25,3 +25,11 @@ const nameRegex =
   osType() === "Windows_NT" ? /[<>:"\\/|?*\0\u2013]/g : /[\\/\0\u2013]/g;
 export const sanitizeName = (name: string): string =>
   name.replace(nameRegex, "-");
+
+/**
+ * Convert an SVG string to a data URL that can
+ * be browsed to with page.goto(getSvgUrl(svg))
+ * @param svg SVG element to convert to a data URL
+ */
+export const getSvgUrl = (svg: string): string =>
+  `data:image/svg+xml;base64,${Buffer.from(svg).toString("base64")}`;
