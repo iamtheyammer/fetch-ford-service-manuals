@@ -41,5 +41,3 @@ export const getSvgUrl = (svg: string): string =>
  */
 export const getHtmlUrl = (html: string): string =>
   `data:text/html;base64,${Buffer.from(html).toString("base64")}`;
-
-export const useProxy = process.env.USE_PROXY === "true";

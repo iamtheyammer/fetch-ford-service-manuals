@@ -7,7 +7,12 @@ import fetchTableOfContents, {
 } from "./wiring/fetchTableOfContents";
 import saveEntireWiring from "./wiring/saveEntireWiring";
 import transformCookieString from "./transformCookieString";
-import { chromium, Page, BrowserContextOptions } from "playwright";
+import {
+  chromium,
+  Page,
+  BrowserContextOptions,
+  BrowserContext,
+} from "playwright";
 import { join } from "path";
 import saveEntireManual from "./saveEntireManual";
 import readConfig, { Config } from "./readConfig";
@@ -15,7 +20,12 @@ import processCLIArgs, { CLIArgs } from "./processCLIArgs";
 import fetchPre2003AlphabeticalIndex from "./pre-2003/fetchAlphabeticalIndex";
 import saveEntirePre2003AlphabeticalIndex from "./pre-2003/saveEntireAlphabeticalIndex";
 import client from "./client";
-import { useProxy } from "./utils";
+import {
+  USER_AGENT,
+  SEC_CH_UA,
+  ENV_USE_PROXY,
+  ENV_HEADLESS_BROWSER,
+} from "./constants";
 
 async function run({
   configPath,
@@ -54,24 +64,46 @@ async function run({
   const browser = await chromium.launch({
     // fix getting wiring SVGs
     args: ["--disable-web-security"],
-    headless: !(process.env.HEADLESS_BROWSER === "false"),
-    proxy: useProxy ? { server: "localhost:8888" } : undefined,
+    headless: ENV_HEADLESS_BROWSER,
+    proxy: ENV_USE_PROXY ? { server: "localhost:8888" } : undefined,
   });
 
-  const defaultContextParams: BrowserContextOptions = {
-    userAgent:
-      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36",
-    extraHTTPHeaders: {
-      // without this, Playwright will put "HeadlessChrome" in here and PTS will reject the request
-      "Sec-Ch-Ua": '"Not/A)Brand";v="24", "Chromium";v="99"',
-    },
+  // getBrowserContext applies modifications required for Headless Chrome to
+  // work with PTS. This includes setting the User-Agent and sec-ch-ua headers,
+  // and adding the cookies.
+  const getBrowserContext = async (): Promise<BrowserContext> => {
+    const context = await browser.newContext({
+      userAgent: USER_AGENT,
+      extraHTTPHeaders: {
+        // Without this, Playwright will put "HeadlessChrome" in here and PTS will reject the request
+        // When headers here conflict with default headers, the ones here take precedence.
+        // HOWEVER, these headers are only used for direct requests from `page.goto()`.
+        // This means that they are NOT used when the browser is redirected.
+        "sec-ch-ua": SEC_CH_UA,
+      },
+    });
+
+    // Mask the sec-ch-ua header on all non-file routes.
+    await context.route(
+      (url) => url.protocol !== "file:",
+      async (route) => {
+        const headers = await route.request().allHeaders();
+        headers["sec-ch-ua"] = SEC_CH_UA;
+        await route.continue({ headers });
+      }
+    );
+
+    // Add cookies
+    await context.addCookies(transformedCookies);
+
+    return context;
   };
+
+  const context = await getBrowserContext();
 
   if (doCookieTest) {
     console.log("Attempting to log into PTS...");
-    const cookieTestingContext = await browser.newContext(defaultContextParams);
-    await cookieTestingContext.addCookies(transformedCookies);
-    const cookieTestingPage = await cookieTestingContext.newPage();
+    const cookieTestingPage = await context.newPage();
     await cookieTestingPage.goto(
       "https://www.fordtechservice.dealerconnection.com",
       { waitUntil: "load" }
@@ -97,15 +129,11 @@ async function run({
       console.error("Failed to log in with the provided cookies.");
       process.exit(1);
     }
-
-    await cookieTestingContext.close();
   }
 
   if (doWorkshopDownload) {
-    const workshopContext = await browser.newContext(defaultContextParams);
-
     if (parseInt(config.workshop.modelYear) >= 2003) {
-      const browserPage = await workshopContext.newPage();
+      const browserPage = await context.newPage();
       await browserPage.route("FordEcat.jpg", (route) => route.abort());
 
       await modernWorkshop(config, outputPath, browserPage, restArgs);
@@ -124,8 +152,8 @@ async function run({
         process.exit(1);
       }
 
-      await workshopContext.addCookies(transformedCookies);
-      const browserPage = await workshopContext.newPage();
+      await context.addCookies(transformedCookies);
+      const browserPage = await context.newPage();
 
       await pre2003Workshop(
         config,
@@ -137,7 +165,6 @@ async function run({
     }
 
     console.log("Saved workshop manual!");
-    await workshopContext.close();
   } else {
     console.log("Skipping workshop manual download.");
   }
@@ -145,11 +172,8 @@ async function run({
   if (doWiringDownload) {
     console.log("Saving wiring manual...");
 
-    const wiringContext = await browser.newContext({
-      ...defaultContextParams,
-    });
-    await wiringContext.addCookies(transformedCookies);
-    const wiringPage = await wiringContext.newPage();
+    await context.addCookies(transformedCookies);
+    const wiringPage = await context.newPage();
 
     const wiringParams: WiringFetchParams = {
       ...config.wiring,
@@ -170,13 +194,12 @@ async function run({
       wiringToC,
       wiringPage
     );
-
-    await wiringContext.close();
   } else {
     console.log("Skipping wiring manual download.");
   }
 
   console.log("Manual downloaded, closing browser");
+  await context.close();
   await browser.close();
 }
 
