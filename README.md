@@ -104,9 +104,11 @@ This script requires some data about your car that's not available in the PTS GU
    - Use these two requests to fill in `params.json` as best as you can.
 10. Save `params.json`.
 11. Filter for the GET request to this URL: `https://www.fordtechservice.dealerconnection.com/wiring/TableOfContents` (there are query params at the end, that's ok).
+   - Unlike last time, make sure "Contents" in the url is PLURAL: `TableOfContent`**`s`**, not `TableOfContent`
 12. Go to the request headers and find the "Cookie:" entry.
-13. Copy the cookies from this request and append them to the end of your `cookieString.txt` file. 
+13. Copy the cookies from this request and add them `cookieString.txt` file. 
    - Do **not** include the name (`cookieString.txt` should **not** include `Cookie:`, for example.)
+   - Order does not matter: you can paste at the beginning or end of the file
    - NOTE: In Firefox, you MUST enable the *Raw* toggle at the top right of Response Headers, then copy it from there. If you don't, you'll get an invalid character error when trying to fetch wiring diagrams.
 14. Save `cookieString.txt`.
 
@@ -189,14 +191,48 @@ All the ones I've tested. Just for fun, I tried:
 - 2008 Mustang
 - 2020 MKZ
 - 2022 F-150
+- 2024 Ford Ranger Raptor (Brazil)
 
 All worked flawlessly!
+
+### How do I re-collect my cookies?
+
+Getting the `cookieString.txt` file correct is probably the most difficult part of running this script. To re-collect cookies, follow the instructions in [this](#all-vehicles-get-wiring-data) set of instructions, making sure you:
+
+- Remove the `Cookie: ` part of the header, if you copied it
+- If using Firefox, enabled the `Raw` toggle at the top right of `Request Headers`
+- Added a `; ` between the first paste and second paste
+
+If you're still having trouble, [reach out](#can-i-get-helpsupport).
+
+### Is this US- or English-only?
+
+No! We've had success all across North America, South America, and Europe.
+
+While the script is in English (meaning all messages that print out will be in English), it will download manuals in the language specified in `params.json`. Note that Ford must have the manual available in the requested language.
+
+To download manuals in a specific language, **change your PTS language**, re-collect
+**all** parameters, and run the download again.
 
 ### How can I support this project?
 
 As Ford continues to change how manuals are accessed, this project requires continuous maintenance.
 
 If this project was helpful to you, you can support this project on GitHub sponsors (click the "Sponsor" button at the top of the page), [buy me a coffee](https://buymeacoffee.com/iamtheyammer), or just share it!
+
+Contributions via pull requests are also more than welcomed. For the highest chance of getting your PR
+merged, please:
+
+- If adding new functionality, consider opening an issue first
+- Keep everything typed - this project is 100% TypeScript!
+- Keep using Yarn berry (no `node_modules` folder)
+- Format your code with `yarn format` before submitting for an easy review
+
+### Can I get help/support?
+
+I'm generally happy to help, but I am a full-time university studdent and this is a pure passion project. I also don't keep a PTS subscription on hand for testing (it's pretty expensive long-term!).
+
+For help, either open a GitHub issue or join the [Discord server](https://discord.gg/gpfUAsMCGV). To help with 99% of issues, I'll need the error you're getting, your `params.json` and `cookieString.txt` files. There's a method on the Discord server to send them privately.
 
 ### Why did you make this?
 
