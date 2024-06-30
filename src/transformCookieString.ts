@@ -56,20 +56,24 @@ export default function transformCookieString(cookieString: string): {
   const pairs = cookieString
     .split(";")
     .map((c: string) => c.trim().split("="))
-    .reduce((a, b) => {
+    .reduce((acc, curr) => {
       // Skip prohibited cookies
-      if (prohibitedCookies.has(b[0])) {
-        return a;
+      if (prohibitedCookies.has(curr[0])) {
+        return acc;
+      }
+
+      if (!curr || curr.length < 2) {
+        return acc;
       }
 
       // Mark expected cookies as found
-      if (expectedCookies[b[0]] === false) {
-        expectedCookies[b[0]] = true;
+      if (expectedCookies[curr[0]] === false) {
+        expectedCookies[curr[0]] = true;
       }
 
       // Store cookie
-      a[b[0]] = b.slice(1).join("=");
-      return a;
+      acc[curr[0]] = curr.slice(1).join("=");
+      return acc;
     }, {} as { [cookie: string]: string });
 
   const cookies = Object.entries(pairs).map(
