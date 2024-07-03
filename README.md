@@ -11,6 +11,7 @@ These manuals are copyrighted by Ford, so don't share them!
 
 - [Usage](#Usage)
 - [Results (what do I get out of this?)](#results)
+- [Common Issues](#common-issues)
 - [FAQ](#faq)
 
 ## Usage
@@ -35,39 +36,46 @@ WSL is a way to run Linux (Ubuntu is recommended for this project) in tandem wit
 ### Get code and dependencies
 
 1. Clone this repository with `git clone https://github.com/iamtheyammer/fetch-ford-service-manuals.git`, and enter the repository's directory (likely with `cd fetch-ford-service-manuals`)
-    - Previously cloned? Run `git pull` to get up to date!
-    - If `git pull` does **not** say `Already up to date.`, run the next 2 steps to ensure your dependencies are up-to-date.
-    - If you get an error while pulling, try running `git stash`, `git pull`, then `git stash apply` to un-stash your files.
+   - Previously cloned? Run `git pull` to get up to date!
+   - If `git pull` does **not** say `Already up to date.`, run the next 2 steps to ensure your dependencies are up-to-date.
+   - If you get an error while pulling, try running `git stash`, `git pull`, then `git stash apply` to un-stash your files.
 2. Run `yarn` to download dependencies
 3. Run `yarn playwright-setup` to download and set up Playwright
 
 ### Set up PTS
 
+These instructions are intended for Chrome or Chrome-based browsers.
+
 1. If you haven't, purchase a PTS subscription from [here](https://www.motorcraftservice.com/Purchase/ViewProduct). The 72 hour subscription is fine.
 2. Once purchased, go to PTS: click [here](https://www.motorcraftservice.com/MySubscriptions), then click on your subscription title. ![how to open PTS](img/open-pts.png)
 3. Once PTS opens, navigate to your car.
-    - **Do not use your VIN.**
-    - On the left, choose *By Year & Model*, then select your car's year and model.
-    - Press GO once selected.
+   - **Do not use your VIN.**
+   - On the left, choose *By Year & Model*, then select your car's year and model.
+   - Press GO once selected.
 
 ### Set up template files
-1. In templates/ create a copy of cookieString.txt.template named "cookieString.txt" and clear the contents.
-2. In templates/ create a copy of params.json.template named "params.json".
+1. In `templates/`, make a copy of `cookieString.txt.template`, and name it `cookieString.txt`
+2. Clear the contents of `cookieString.txt`
+3. In `templates/`, make a copy of `params.json.template`, and name it `params.json`.
+
+### Watch the tutorial video (optional)
+
+[This tutorial](https://youtu.be/Ax8TAndmLhU) shows you how to collect cookies, wiring params, and workshop params for cars made in 2003 or newer.
 
 ### **2003 or newer:** Get data for your car
 
 **If your vehicle was made BEFORE 2003, use [these](#2002-or-older-get-data-for-your-car) instructions.**
 
-This script requires some data about your car that's not available in the PTS GUI in order to fetch the correct manual.
+This script requires some data about your car that's not available in the PTS GUI in order to fetch the correct manual. There's a tutorial video [here](https://youtu.be/Ax8TAndmLhU) that shows you how to collect this data, too.
 
 1. Open DevTools, and navigate to the Network tab.
 2. Click on the Workshop tab in PTS.
 3. Filter for the one POST to `https://www.fordservicecontent.com/Ford_Content/PublicationRuntimeRefreshPTS//publication/prod_1_3_372022/TreeAndCover/workshop/32/~WSLL/{some numbers here}`. It should look similar to the request in [this photo](img/workshop-request.png).
 4. Click on that request, and look at the sent form data (i.e. the payload).
 5. Open [`templates/params.json`](templates/params.json), and copy information from that request into the values of the JSON `.workshop` field.
-    - **Do not add fields. Only change values.**
-    - Change the values to match. You probably won't need to change anything under the line break.
-    - If you can't find the Book Title or Wiring Book Title, look in the query string parameters. **Do not leave them blank!**
+   - **Do not add fields. Only change values.**
+   - Change the values to match. You probably won't need to change anything under the line break.
+   - If you can't find the Book Title or Wiring Book Title, look in the query string parameters. **Do not leave them blank!**
 6. Get your wiring data: follow instructions [here](#all-vehicles-get-wiring-data).
 
 ### **2002 or older:** Get data for your car
@@ -79,9 +87,9 @@ This script requires some data about your car that's not available in the PTS GU
    - To proceed, click on either manual.
 2. In the sidebar, right click on "Alphabetical Index", and click "Copy Link Address" (see [picture](img/pre-2003-index.jpg)).
 3. Open [`templates/params.json`](templates/params.json), and change only:
-    - `workshop.modelYear` to the year of your car
-    - `pre_2003.alphabeticalIndexURL` to the URL you copied in step 2
-    - The rest will be filled in later
+   - `workshop.modelYear` to the year of your car
+   - `pre_2003.alphabeticalIndexURL` to the URL you copied in step 2
+   - The rest will be filled in later
 4. Open DevTools in your browser.
 5. Get your wiring data: follow instructions [here](#all-vehicles-get-wiring-data).
 
@@ -89,7 +97,7 @@ This script requires some data about your car that's not available in the PTS GU
 
 1. Create a copy of `cookieString.txt.template` called `cookieString.txt` if you haven't already.
 2. Clear the DevTools Network pane (click on the trash can or circle with a line through it)
-3. Go to the Workshop tab in PTS. 
+3. Go to the Workshop tab in PTS.
 4. Filter for the one POST to `https://www.fordservicecontent.com/Ford_Content/PublicationRuntimeRefreshPTS//publication/prod_1_3_{datecode}/TreeAndCover/workshop/32/~WSLL/{some numbers here}`.
 5. Go to the request headers and find the "Cookie:" entry.
 6. Open your `cookieString.txt` file, clear the contents, and copy these cookies into the file. Add a semi-colon and space at the end of the file because we will be adding more cookies in a later step.
@@ -97,24 +105,27 @@ This script requires some data about your car that's not available in the PTS GU
    - NOTE: In Firefox, you MUST enable the *Raw* toggle at the top right of Response Headers, then copy it from there. If you don't, you'll get an invalid character error when trying to fetch wiring diagrams.
 7. Click the Wiring tab at the top of PTS.
 8. Filter for the GET request to this URL: `https://www.fordservicecontent.com/Ford_Content/PublicationRuntimeRefreshPTS//wiring/TableofContent` (there are query params at the end, that's ok). It should look similar to the request in [this photo](img/wiring-request.png).
+   - Make sure that "Content" in the url is SINGULAR: `TableOfContent`, not `TableOfContent`**`s`**
 9. Copy the `environment`,`bookType`, and `languageCode` query params into `.wiring` in `params.json`.
-   - **If your vehicle was made before 2003** (or if `WiringBookTitle` or `WiringBookCode` are missing), you may find these in another request to `https://www.fordtechservice.dealerconnection.com/wiring/TableOfContents` (with some query params at the end):
+   - If `WiringBookTitle` or `WiringBookCode` are still missing, you may need to select you may need to select a wiring manual. After selecing a manual, you'll find these in another request to `https://www.fordtechservice.dealerconnection.com/wiring/TableOfContents` (with some query params at the end):
    - `booktitle` → `WiringBookTitle`
    - `book` → `WiringBookCode`
    - Use these two requests to fill in `params.json` as best as you can.
 10. Save `params.json`.
 11. Filter for the GET request to this URL: `https://www.fordtechservice.dealerconnection.com/wiring/TableOfContents` (there are query params at the end, that's ok).
-   - Unlike last time, make sure "Contents" in the url is PLURAL: `TableOfContent`**`s`**, not `TableOfContent`
+    - Unlike last time, make sure "Contents" in the url is PLURAL: `TableOfContent`**`s`**, not `TableOfContent`
 12. Go to the request headers and find the "Cookie:" entry.
-13. Copy the cookies from this request and add them `cookieString.txt` file. 
-   - Do **not** include the name (`cookieString.txt` should **not** include `Cookie:`, for example.)
-   - Order does not matter: you can paste at the beginning or end of the file
-   - NOTE: In Firefox, you MUST enable the *Raw* toggle at the top right of Response Headers, then copy it from there. If you don't, you'll get an invalid character error when trying to fetch wiring diagrams.
+13. Copy the cookies from this request and add them `cookieString.txt` file.
+    - Do **not** include the name (`cookieString.txt` should **not** include `Cookie:`, for example.)
+    - Order does not matter: you can paste at the beginning or end of the file, but make sure that there is a semi-colon and space (`; `) after the first paste and before the second.
+    - NOTE: In Firefox, you MUST enable the *Raw* toggle at the top right of Response Headers, then copy it from there. If you don't, you'll get an invalid character error when trying to fetch wiring diagrams.
 14. Save `cookieString.txt`.
 
 ### Download the manual!
 
 To download the manual as PDFs, run `yarn start -c templates/params.json -s templates/cookieString.txt -o /directory/where/you/want/the/downloaded/manual/`. You should see output that looks like [this](img/example-output.png).
+
+Before manuals start to download, the bot will validate that your cookies are correctly set up by attempting to open the PTS site in the background. While you _can_ skip this check, there is a good chance that skipping it (with `--noCookieTest`) will result in an error later on.
 
 Make sure that the directory for the downloaded manual is empty-- it'll have lots of subfolders.
 
@@ -124,6 +135,8 @@ It can take a little while! On a fast computer with a fast internet connection, 
 
 Also, the resulting folder is pretty sizeable. The folder for the 2005 Taurus was about 300mb, and the F150 folder was a couple gigabytes.
 
+Having issues? See [Common Issues](#common-issues) or [FAQ](#faq).
+
 ## Results
 
 This bot downloads the **entire** workshop manual and **all** wiring diagrams for the vehicle you set up.
@@ -132,7 +145,7 @@ This bot downloads the **entire** workshop manual and **all** wiring diagrams fo
 
 Wiring diagrams will be in `outputpath/Wiring`. There's also a `toc.json` file with the table of contents for the wiring diagrams.
 
-#### Connector Views & Component Location Charts (~2006 or newer)
+#### Connector Views & Component Location Charts
 
 If you have a `Wiring/Connector Views` folder, you've got a special file in there: `Connectors.csv`.
 It tells you where to find every connector in the car, and where it is in the Component Location Charts.
@@ -179,6 +192,38 @@ There are also a few special files:
 
 These files are prefixed with `AAA` so they appear at the top of the file list in most file browsers.
 
+## Common Issues
+
+### Failed to log in with the provided cookies.
+
+When the script starts, it tries to sign in to PTS to verify that your cookies are working. If this fails, you may not be able to fetch manuals. 
+
+Try to [re-collect cookies](#how-do-i-re-collect-my-cookies) and make sure you're using the correct ones. If you're 100% sure that your cookies are correct, you can add `--noCookieTest` to the command.
+
+### Looks like your PTS subscription has expired
+
+Well, it looks like your subscription has expired. You'll need to renew it to download manuals.
+
+This check can also be skipped with `--noCookieTest`, but without a subscription you won't be able to download manuals.
+
+### Expected cookie `...` not found in cookie string. This may affect functionality.
+
+The script auto-checks your cookie file against a list of expected cookies. If it can't find one of the expected cookies, it'll warn you (note that the bot does not stop if this prints out).
+
+If you see this message and the script starts to download manuals, let it go-- it's just a warning. If you see the message and everything downloads just fine, please open a GitHub issue so I can fix it for others.
+
+If you're having issues, try [re-collecting your cookies](#how-do-i-re-collect-my-cookies).
+
+### `ERR_HTTP2_PROTOCOL_ERROR`
+
+This can either mean that your cookies are invalid or that Ford (actually Akamai) has detected we're using a headless browser (Playwright).
+
+First, try [re-collecting your cookies](#how-do-i-re-collect-my-cookies) and trying again. If you still have issues, open a GitHub issue.
+
+### `ERR_BAD_RESPONSE`
+
+This usually means that one of the fields in your `params.json` file is incorrect. Check that all the fields are correct, and if you're still having issues, open a GitHub issue. (This sometimes happens as Ford updates their site.)
+
 ## FAQ
 
 ### Which vehicles does this work with?
@@ -197,10 +242,13 @@ All worked flawlessly!
 
 ### How do I re-collect my cookies?
 
-Getting the `cookieString.txt` file correct is probably the most difficult part of running this script. To re-collect cookies, follow the instructions in [this](#all-vehicles-get-wiring-data) set of instructions, making sure you:
+Getting the `cookieString.txt` file correct is probably the most difficult part of running this script. **If you haven't watched the [video tutorial](https://youtu.be/Ax8TAndmLhU), please do so.**
+
+To re-collect cookies, follow the instructions in [the video](https://youtu.be/Ax8TAndmLhU) or [this](#all-vehicles-get-wiring-data) set of instructions, making sure you:
 
 - Remove the `Cookie: ` part of the header, if you copied it
 - If using Firefox, enabled the `Raw` toggle at the top right of `Request Headers`
+  - For best results, use Chrome
 - Added a `; ` between the first paste and second paste
 
 If you're still having trouble, [reach out](#can-i-get-helpsupport).
@@ -227,6 +275,8 @@ merged, please:
 - Keep everything typed - this project is 100% TypeScript!
 - Keep using Yarn berry (no `node_modules` folder)
 - Format your code with `yarn format` before submitting for an easy review
+
+These are not requirements-- I can always help you with these things-- but they make the process faster.
 
 ### Can I get help/support?
 
