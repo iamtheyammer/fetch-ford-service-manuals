@@ -20,7 +20,6 @@ const expectedCookies: { [cookieName: string]: boolean } = {
   AKA_A2: false,
   bm_mi: false,
   bm_sv: false,
-  PTSSession: false,
   "TPS%2DMEMBERSHIP": false,
   "TPS%2DPERM": false,
 };
