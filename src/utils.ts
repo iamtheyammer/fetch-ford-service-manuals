@@ -1,5 +1,5 @@
 import { access } from "fs/promises";
-import { constants } from "fs";
+import { constants, createWriteStream } from "fs";
 import { type as osType } from "os";
 
 export async function fileExists(path: string): Promise<boolean> {
@@ -26,18 +26,18 @@ const nameRegex =
 export const sanitizeName = (name: string): string =>
   name.replace(nameRegex, "-");
 
-/**
- * Convert an SVG string to a data URL that can
- * be browsed to with page.goto(getSvgUrl(svg))
- * @param svg SVG element to convert to a data URL
- */
-export const getSvgUrl = (svg: string): string =>
-  `data:image/svg+xml;base64,${Buffer.from(svg).toString("base64")}`;
+export default function saveStream(stream: any, path: string): Promise<void> {
+  return new Promise<void>((resolve, reject) => {
+    const writer = createWriteStream(path);
+    stream.pipe(writer);
 
-/**
- * Convert an HTML string to a data URL that
- * can be browsed to with page.goto(getHtmlUrl(html))
- * @param html HTML string to convert to a data URL
- */
-export const getHtmlUrl = (html: string): string =>
-  `data:text/html;base64,${Buffer.from(html).toString("base64")}`;
+    writer.on("error", (err) => {
+      writer.close();
+      reject(err);
+    });
+
+    writer.on("close", () => {
+      resolve();
+    });
+  });
+}

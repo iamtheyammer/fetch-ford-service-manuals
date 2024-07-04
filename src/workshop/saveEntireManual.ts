@@ -1,11 +1,10 @@
 import { mkdir, writeFile } from "fs/promises";
 import { join, resolve } from "path";
 import fetchManualPage, { FetchManualPageParams } from "./fetchManualPage";
-import client from "./client";
+import client from "../client";
 import { Page } from "playwright";
-import saveStream from "./saveStream";
-import { CLIArgs } from "./processCLIArgs";
-import { sanitizeName } from "./utils";
+import { CLIArgs } from "../processCLIArgs";
+import saveStream, { sanitizeName } from "../utils";
 
 export type SaveOptions = Pick<CLIArgs, "saveHTML" | "ignoreSaveErrors">;
 

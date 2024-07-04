@@ -9,7 +9,7 @@ import {
 import { mkdir, writeFile } from "fs/promises";
 import { join } from "path";
 import { Page } from "playwright";
-import { FetchManualPageParams } from "../fetchManualPage";
+import { FetchManualPageParams } from "../workshop/fetchManualPage";
 import savePage, { WiringFetchPageParams } from "./savePage";
 import saveConnector from "./saveConnector";
 import { saveLocIndex } from "./saveLocIndex";

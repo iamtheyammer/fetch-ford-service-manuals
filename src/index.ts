@@ -1,7 +1,7 @@
 import { writeFile, readFile, mkdir } from "fs/promises";
 import fetchTreeAndCover, {
   FetchTreeAndCoverParams,
-} from "./fetchTreeAndCover";
+} from "./workshop/fetchTreeAndCover";
 import fetchTableOfContents, {
   WiringFetchParams,
 } from "./wiring/fetchTableOfContents";
@@ -14,7 +14,7 @@ import {
   BrowserContext,
 } from "playwright";
 import { join } from "path";
-import saveEntireManual from "./saveEntireManual";
+import saveEntireManual from "./workshop/saveEntireManual";
 import readConfig, { Config } from "./readConfig";
 import processCLIArgs, { CLIArgs } from "./processCLIArgs";
 import fetchPre2003AlphabeticalIndex from "./pre-2003/fetchAlphabeticalIndex";
@@ -102,7 +102,8 @@ async function run({
   const context = await getBrowserContext();
 
   if (doCookieTest) {
-    console.log("Attempting to log into PTS...");
+    // no newline after write
+    process.stdout.write("Attempting to log into PTS...");
     const cookieTestingPage = await context.newPage();
     await cookieTestingPage.goto(
       "https://www.fordtechservice.dealerconnection.com",
@@ -129,6 +130,8 @@ async function run({
       console.error("Failed to log in with the provided cookies.");
       process.exit(1);
     }
+    console.log("ok!");
+    await cookieTestingPage.close();
   }
 
   if (doWorkshopDownload) {

@@ -1,7 +1,7 @@
-import { FetchManualPageParams } from "./fetchManualPage";
 import { readFile } from "fs/promises";
 import { fileExists } from "./utils";
 import { join } from "path";
+import type { FetchManualPageParams } from "./workshop/fetchManualPage";
 
 export interface Config {
   workshop: FetchManualPageParams;

@@ -1,14 +1,1 @@
-1. Create copy of this file named "cookieString.txt"
-2. Clear contents
-3. Copy/Paste cookies as described in the README. You should have the following cookies:
-	CONTENT_AUTH
-	CONTENT_PERMISSIONS
-	dtCookie
-	Ford.TSO.PTSSuite
-	TPS%2DPERM
-	PREFERENCES
-	TPS%2DMEMBERSHIP
-	AKA_A2
-	bm_mi
-	bm_sv
-	PTSSession
+Check the README for instructions on how to use this file.

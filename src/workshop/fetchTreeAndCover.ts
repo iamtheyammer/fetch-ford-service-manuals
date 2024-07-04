@@ -1,4 +1,4 @@
-import client from "./client";
+import client from "../client";
 import { stringify } from "qs";
 import { FetchManualPageParams } from "./fetchManualPage";
 import { JSDOM } from "jsdom";

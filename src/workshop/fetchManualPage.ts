@@ -1,4 +1,4 @@
-import client from "./client";
+import client from "../client";
 import { stringify } from "qs";
 
 export interface FetchManualPageParams {
