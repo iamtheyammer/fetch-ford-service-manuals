@@ -72,8 +72,9 @@ This script requires some data about your car that's not available in the PTS GU
 2. Click on the Workshop tab in PTS.
 3. Filter for the one POST to `https://www.fordservicecontent.com/Ford_Content/PublicationRuntimeRefreshPTS//publication/prod_1_3_372022/TreeAndCover/workshop/32/~WSLL/{some numbers here}`. It should look similar to the request in [this photo](img/workshop-request.png).
 4. Click on that request, and look at the sent form data (i.e. the payload).
-5. Open [`templates/params.json`](templates/params.json), and copy information from that request into the values of the JSON `.workshop` field.
+5. Open [`templates/params.json`](templates/params.json), and copy/paste information from that request into the values of the JSON `.workshop` field.
    - **Do not add fields. Only change values.**
+   - Copy-and-paste values to ensure you don't add typos.
    - Change the values to match. You probably won't need to change anything under the line break.
    - If you can't find the Book Title or Wiring Book Title, look in the query string parameters. **Do not leave them blank!**
 6. Get your wiring data: follow instructions [here](#all-vehicles-get-wiring-data).
@@ -90,6 +91,7 @@ This script requires some data about your car that's not available in the PTS GU
    - `workshop.modelYear` to the year of your car
    - `pre_2003.alphabeticalIndexURL` to the URL you copied in step 2
    - The rest will be filled in later
+   - Copy-and-paste values to ensure you don't add typos.
 4. Open DevTools in your browser.
 5. Get your wiring data: follow instructions [here](#all-vehicles-get-wiring-data).
 
