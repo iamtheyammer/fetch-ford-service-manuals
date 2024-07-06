@@ -47,7 +47,7 @@ export default async function saveEntireWiring(
           language: fetchManualParams.contentlanguage,
           cell: doc.Number,
           page: "1",
-          vehicleId: fetchManualParams.vechicleId,
+          vehicleId: fetchManualParams.vehicleId,
           bookType: fetchWiringParams.bookType,
           country: fetchManualParams.contentmarket,
           title: doc.Title,
