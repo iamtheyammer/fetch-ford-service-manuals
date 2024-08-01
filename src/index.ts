@@ -50,9 +50,9 @@ async function run({
   }
 
   console.log("Processing cookies...");
-  const rawCookieString = (
-    await readFile(cookiePath, { encoding: "utf-8" })
-  ).trim();
+  const rawCookieString = (await readFile(cookiePath, { encoding: "utf-8" }))
+    .trim()
+    .replaceAll("\n", " ");
   const { transformedCookies, processedCookieString } =
     transformCookieString(rawCookieString);
 

@@ -10,7 +10,7 @@ export default async function fetchSvg(
 ): Promise<string> {
   const req = await client({
     method: "GET",
-    url: `https://www.fordservicecontent.com/ford_content/PublicationRuntimeRefreshPTS/wiring/svg/${environment}/${vehicleId}/~W${wiringBookCode}/${languageCode}/svg/${docNumber}/0/${parseInt(
+    url: `https://www.fordservicecontent.dealerconnection.com/ford_content/PublicationRuntimeRefreshPTS/wiring/svg/${environment}/${vehicleId}/~W${wiringBookCode}/${languageCode}/svg/${docNumber}/0/${parseInt(
       pageNumber
     )}.svg`,
     params: {
