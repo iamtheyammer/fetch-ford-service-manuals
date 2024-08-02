@@ -58,15 +58,11 @@ These instructions are intended for Chrome or Chrome-based browsers.
 2. Clear the contents of `cookieString.txt`
 3. In `templates/`, make a copy of `params.json.template`, and name it `params.json`.
 
-### Watch the tutorial video (optional)
-
-[This tutorial](https://youtu.be/Ax8TAndmLhU) shows you how to collect cookies, wiring params, and workshop params for cars made in 2003 or newer.
-
 ### **2003 or newer:** Get data for your car
 
 **If your vehicle was made BEFORE 2003, use [these](#2002-or-older-get-data-for-your-car) instructions.**
 
-This script requires some data about your car that's not available in the PTS GUI in order to fetch the correct manual. There's a tutorial video [here](https://youtu.be/Ax8TAndmLhU) that shows you how to collect this data, too.
+This script requires some data about your car that's not available in the PTS GUI in order to fetch the correct manual. 
 
 1. Open DevTools, and navigate to the Network tab.
 2. Click on the Workshop tab in PTS.
@@ -237,9 +233,7 @@ All worked flawlessly!
 
 ### How do I re-collect my cookies?
 
-Getting the `cookieString.txt` file correct is probably the most difficult part of running this script. **If you haven't watched the [video tutorial](https://youtu.be/Ax8TAndmLhU), please do so.**
-
-To re-collect cookies, follow the instructions in [the video](https://youtu.be/Ax8TAndmLhU) or [this](#all-vehicles-get-wiring-data) set of instructions, making sure you:
+To re-collect cookies, follow the instructions in [this](#all-vehicles-get-wiring-data) set of instructions, making sure you:
 
 - Remove the `Cookie: ` part of the header, if you copied it
 - If using Firefox, enabled the `Raw` toggle at the top right of `Request Headers`
