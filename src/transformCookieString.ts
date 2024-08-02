@@ -13,11 +13,11 @@ const prohibitedCookies: Set<string> = new Set(["ak_bmsc"]);
 // expectedCookies will be checked for existence during parsing
 const expectedCookies: [string | RegExp, boolean][] = [
   ["AKA_A2", false],
+  ["ASP.NET_SessionId", false],
   ["bm_mi", false],
   ["bm_sv", false],
-  ["dtCookie", false],
   ["Ford.TSO.PTSSuite", false],
-  [/^OpenIdConnect\.nonce\.[A-z0-9%]+$/, false],
+  ["PERSISTENT", false],
   ["PREFERENCES", false],
   ["TPS%2DMEMBERSHIP", false],
   ["TPS%2DPERM", false],
