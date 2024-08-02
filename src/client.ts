@@ -1,9 +1,10 @@
 import axios from "axios";
 
+import { ENV_USE_PROXY, USER_AGENT } from "./constants";
+
 const client = axios.create({
   headers: {
-    "User-Agent":
-      "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:97.0) Gecko/20100101 Firefox/97.0",
+    "User-Agent": USER_AGENT,
     Accept: "text/html, */*; q=0.01",
     "Accept-Language": "en-US,en;q=0.05",
     "Accept-Encoding": "gzip, deflate, br",
@@ -15,6 +16,13 @@ const client = axios.create({
     "Sec-Fetch-Site": "cross-site",
     "Sec-GPC": "1",
   },
+  proxy: ENV_USE_PROXY
+    ? {
+        protocol: "http",
+        host: "localhost",
+        port: 8888,
+      }
+    : false,
 });
 
 export default client;

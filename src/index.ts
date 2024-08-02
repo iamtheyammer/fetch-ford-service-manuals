@@ -1,27 +1,38 @@
 import { writeFile, readFile, mkdir } from "fs/promises";
 import fetchTreeAndCover, {
   FetchTreeAndCoverParams,
-} from "./fetchTreeAndCover";
+} from "./workshop/fetchTreeAndCover";
 import fetchTableOfContents, {
-  FetchWiringTableOfContents,
+  WiringFetchParams,
 } from "./wiring/fetchTableOfContents";
 import saveEntireWiring from "./wiring/saveEntireWiring";
 import transformCookieString from "./transformCookieString";
-import { chromium, Page } from "playwright";
+import { chromium, Page, BrowserContext } from "playwright";
 import { join } from "path";
-import saveEntireManual from "./saveEntireManual";
+import saveEntireManual from "./workshop/saveEntireManual";
 import readConfig, { Config } from "./readConfig";
 import processCLIArgs, { CLIArgs } from "./processCLIArgs";
 import fetchPre2003AlphabeticalIndex from "./pre-2003/fetchAlphabeticalIndex";
 import saveEntirePre2003AlphabeticalIndex from "./pre-2003/saveEntireAlphabeticalIndex";
+import client from "./client";
+import {
+  USER_AGENT,
+  SEC_CH_UA,
+  ENV_USE_PROXY,
+  ENV_HEADLESS_BROWSER,
+} from "./constants";
 
 async function run({
   configPath,
   outputPath,
   cookiePath,
+  doWorkshopDownload,
+  doWiringDownload,
+  doParamsValidation,
+  doCookieTest,
   ...restArgs
 }: CLIArgs) {
-  const config = await readConfig(configPath);
+  const config = await readConfig(configPath, doParamsValidation);
 
   // create output dir
   try {
@@ -34,102 +45,163 @@ async function run({
   }
 
   console.log("Processing cookies...");
-  const cookieString = (
-    await readFile(cookiePath, { encoding: "utf-8" })
-  ).trim();
-  const transformedCookieString = transformCookieString(cookieString);
+  const rawCookieString = (await readFile(cookiePath, { encoding: "utf-8" }))
+    .trim()
+    .replaceAll("\n", " ");
+  const { transformedCookies, processedCookieString } =
+    transformCookieString(rawCookieString);
+
+  // Add the cookie string to the Axios client
+  // It'll be sent with every request automatically
+  client.defaults.headers.Cookie = processedCookieString;
 
   console.log("Creating a headless chromium instance...");
   const browser = await chromium.launch({
     // fix getting wiring SVGs
     args: ["--disable-web-security"],
-    headless: true,
+    headless: ENV_HEADLESS_BROWSER,
+    proxy: ENV_USE_PROXY ? { server: "localhost:8888" } : undefined,
   });
 
-  const workshopContextParams = {
-    userAgent:
-      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36",
-  };
-  const workshopContext = await browser.newContext(workshopContextParams);
+  // getBrowserContext applies modifications required for Headless Chrome to
+  // work with PTS. This includes setting the User-Agent and sec-ch-ua headers,
+  // and adding the cookies.
+  const getBrowserContext = async (): Promise<BrowserContext> => {
+    const context = await browser.newContext({
+      userAgent: USER_AGENT,
+      extraHTTPHeaders: {
+        // Without this, Playwright will put "HeadlessChrome" in here and PTS will reject the request
+        // When headers here conflict with default headers, the ones here take precedence.
+        // HOWEVER, these headers are only used for direct requests from `page.goto()`.
+        // This means that they are NOT used when the browser is redirected.
+        "sec-ch-ua": SEC_CH_UA,
+        // TODO: Playwright bug: accept-language header not set in headless mode
+        "accept-language": `${config.workshop.contentlanguage.toLowerCase()}-${
+          config.workshop.contentmarket
+        },${config.workshop.contentlanguage.toLowerCase()};q=0.9`,
+      },
+    });
 
-  if (parseInt(config.workshop.modelYear) >= 2003) {
-    const browserPage = await workshopContext.newPage();
-    await browserPage.route("FordEcat.jpg", (route) => route.abort());
-
-    await modernWorkshop(config, outputPath, browserPage, restArgs);
-  } else {
-    console.log(
-      "Downloading pre-2003 workshop manual, please see README for details..."
+    // Mask the sec-ch-ua header on all non-file routes.
+    await context.route(
+      (url) => url.protocol !== "file:",
+      async (route) => {
+        const headers = await route.request().allHeaders();
+        headers["sec-ch-ua"] = SEC_CH_UA;
+        await route.continue({ headers });
+      }
     );
 
-    if (
-      config.pre_2003.alphabeticalIndexURL ===
-      "https://www.fordservicecontent.com/pubs/content/....."
-    ) {
+    // Add cookies
+    await context.addCookies(transformedCookies);
+
+    return context;
+  };
+
+  const context = await getBrowserContext();
+
+  if (doCookieTest) {
+    // no newline after write
+    process.stdout.write("Attempting to log into PTS...");
+    const cookieTestingPage = await context.newPage();
+    await cookieTestingPage.goto(
+      "https://www.fordtechservice.dealerconnection.com",
+      { waitUntil: "load" }
+    );
+    if (cookieTestingPage.url().includes("subscriptionExpired")) {
       console.error(
-        "Please set the URL for the pre-2003 alphabetical index in the config file."
+        "Looks like your PTS subscription has expired. " +
+          "Re-subscribe to download manuals. If you just want to download a workshop manual, " +
+          "you may be able to do so without re-subscribing: run the script with --noCookieTest."
       );
+      const expiryDate = await cookieTestingPage.evaluate(
+        'document.querySelector("#pts-page > ul > li > b")?.innerText?.trim()'
+      );
+      if (expiryDate) {
+        console.error(expiryDate);
+      }
+      process.exit(1);
+    } else if (
+      !cookieTestingPage
+        .url()
+        .startsWith("https://www.fordtechservice.dealerconnection.com")
+    ) {
+      console.error("Failed to log in with the provided cookies.");
       process.exit(1);
     }
-
-    await workshopContext.addCookies(transformedCookieString);
-    const browserPage = await workshopContext.newPage();
-
-    await pre2003Workshop(
-      config,
-      outputPath,
-      cookieString,
-      browserPage,
-      restArgs
-    );
+    console.log("ok!");
+    await cookieTestingPage.close();
   }
 
-  console.log("Saved workshop manual!");
-  await workshopContext.close();
+  if (doWorkshopDownload) {
+    if (parseInt(config.workshop.modelYear) >= 2003) {
+      const browserPage = await context.newPage();
+      await browserPage.route("FordEcat.jpg", (route) => route.abort());
 
-  console.log("Saving wiring manual...");
+      await modernWorkshop(config, outputPath, browserPage, restArgs);
+    } else {
+      console.log(
+        "Downloading pre-2003 workshop manual, please see README for details..."
+      );
 
-  const wiringContext = await browser.newContext({
-    ...workshopContextParams,
-    viewport: {
-      width: 2560,
-      height: 1440,
-    },
-  });
-  await wiringContext.addCookies(transformedCookieString);
-  const wiringPage = await wiringContext.newPage();
+      if (
+        config.pre_2003.alphabeticalIndexURL ===
+        "https://www.fordservicecontent.com/pubs/content/....."
+      ) {
+        console.error(
+          "Please set the URL for the pre-2003 alphabetical index in the config file."
+        );
+        process.exit(1);
+      }
 
-  // wiringPage.on("requestfinished", async resp => {
-  //   if(!resp.url().includes(".svg")) return;
-  //   const respData = await resp.allHeaders()
-  //   console.log(resp.url());
-  //   console.log(respData);
-  //   const response = await resp.response();
-  //   console.log((await response!.body()).toString())
-  // })
-  // wiringPage.on("console", console.log)
+      await context.addCookies(transformedCookies);
+      const browserPage = await context.newPage();
 
-  const wiringParams: FetchWiringTableOfContents = {
-    ...config.wiring,
-    book: config.workshop.WiringBookCode,
-    contentlanguage: config.workshop.contentlanguage,
-    contentmarket: config.workshop.contentmarket,
-  };
+      await pre2003Workshop(
+        config,
+        outputPath,
+        rawCookieString,
+        browserPage,
+        restArgs
+      );
+    }
 
-  const wiringToC = await fetchTableOfContents(wiringParams, cookieString);
+    console.log("Saved workshop manual!");
+  } else {
+    console.log("Skipping workshop manual download.");
+  }
 
-  await saveEntireWiring(
-    outputPath,
-    config.workshop,
-    wiringParams,
-    wiringToC,
-    cookieString,
-    wiringPage
-  );
+  if (doWiringDownload) {
+    console.log("Saving wiring manual...");
 
-  await wiringContext.close();
+    await context.addCookies(transformedCookies);
+    const wiringPage = await context.newPage();
+
+    const wiringParams: WiringFetchParams = {
+      ...config.wiring,
+      book: config.workshop.WiringBookCode,
+      contentlanguage: config.workshop.contentlanguage,
+      contentmarket: config.workshop.contentmarket,
+      languageCode: config.workshop.languageOdysseyCode,
+    };
+
+    console.log("Fetching wiring table of contents...");
+
+    const wiringToC = await fetchTableOfContents(wiringParams);
+
+    await saveEntireWiring(
+      outputPath,
+      config.workshop,
+      wiringParams,
+      wiringToC,
+      wiringPage
+    );
+  } else {
+    console.log("Skipping wiring manual download.");
+  }
 
   console.log("Manual downloaded, closing browser");
+  await context.close();
   await browser.close();
 }
 
@@ -201,4 +273,4 @@ async function pre2003Workshop(
 }
 
 const args = processCLIArgs();
-run(args);
+run(args).then(() => process.exit(0));

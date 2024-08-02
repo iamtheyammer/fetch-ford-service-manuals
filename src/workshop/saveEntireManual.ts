@@ -1,11 +1,10 @@
-import { mkdir, writeFile, access } from "fs/promises";
+import { mkdir, writeFile } from "fs/promises";
 import { join, resolve } from "path";
 import fetchManualPage, { FetchManualPageParams } from "./fetchManualPage";
-import client from "./client";
+import client from "../client";
 import { Page } from "playwright";
-import saveStream from "./saveStream";
-import { CLIArgs } from "./processCLIArgs";
-import { fileExists, sanitizeName } from "./utils";
+import { CLIArgs } from "../processCLIArgs";
+import saveStream, { sanitizeName } from "../utils";
 
 export type SaveOptions = Pick<CLIArgs, "saveHTML" | "ignoreSaveErrors">;
 
@@ -21,7 +20,7 @@ export default async function saveEntireManual(
   for (let i = 0; i < exploded.length; i++) {
     const [name, docID] = exploded[i];
 
-    if (typeof docID === "string") {
+    if (typeof docID === "string" && docID.length > 0) {
       // download and save document
       if (docID.startsWith("http") && docID.includes(".pdf")) {
         console.log(`Downloading manual PDF ${name} ${docID}`);
@@ -76,11 +75,15 @@ export default async function saveEntireManual(
           await writeFile(htmlPath, pageHTML);
         }
 
-        await saveHTMLAsPDF(
-          pageHTML,
-          join(path, `/${filename}.pdf`),
-          browserPage
+        await browserPage.setContent(pageHTML, { waitUntil: "load" });
+        // removes this little color-coded thing that doesn't load properly
+        // in Playwright, just says "Workshop Manual Graphics Training"...
+        await browserPage.evaluate(
+          'document.querySelectorAll("body > div > table > tbody > tr > td:nth-child(2)").forEach(e => e.remove())'
         );
+        await browserPage.pdf({
+          path: join(path, `/${filename}.pdf`),
+        });
       } catch (e) {
         if (options.ignoreSaveErrors) {
           console.error(
@@ -117,17 +120,6 @@ export default async function saveEntireManual(
       );
     }
   }
-}
-
-export async function saveHTMLAsPDF(
-  htmlContent: string,
-  pdfPath: string,
-  page: Page
-): Promise<void> {
-  await page.setContent(htmlContent, { waitUntil: "load" });
-  await page.pdf({
-    path: pdfPath,
-  });
 }
 
 // export async function saveURLAsPDF(

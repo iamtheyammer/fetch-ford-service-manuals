@@ -5,6 +5,10 @@ export interface CLIArgs {
   configPath: string;
   outputPath: string;
   cookiePath: string;
+  doWorkshopDownload: boolean;
+  doWiringDownload: boolean;
+  doParamsValidation: boolean;
+  doCookieTest: boolean;
   saveHTML: boolean;
   ignoreSaveErrors: boolean;
 }
@@ -25,6 +29,26 @@ export default function processCLIArgs(): CLIArgs {
       name: "outputPath",
       alias: "o",
       type: String,
+    },
+    {
+      name: "noWorkshop",
+      type: Boolean,
+      default: false,
+    },
+    {
+      name: "noWiring",
+      type: Boolean,
+      default: false,
+    },
+    {
+      name: "noParamsValidation",
+      type: Boolean,
+      default: false,
+    },
+    {
+      name: "noCookieTest",
+      type: Boolean,
+      default: false,
     },
     {
       name: "saveHTML",
@@ -70,6 +94,27 @@ export default function processCLIArgs(): CLIArgs {
             "{bold Required.} Directory where you'd like the manual to download to. Should be an empty directory.",
         },
         {
+          name: "noWorkshop",
+          typeLabel: " ",
+          description: "Skip downloading the Workshop Manual.",
+        },
+        {
+          name: "noWiring",
+          typeLabel: " ",
+          description: "Skip downloading the Wiring Diagrams.",
+        },
+        {
+          name: "noParamsValidation",
+          typeLabel: " ",
+          description: "Skip validating the configFile.",
+        },
+        {
+          name: "noCookieTest",
+          typeLabel: " ",
+          description:
+            "Skip trying to log into PTS before downloading manuals.",
+        },
+        {
           name: "saveHTML",
           typeLabel: " ",
           description:
@@ -109,6 +154,10 @@ export default function processCLIArgs(): CLIArgs {
       configPath: options.configFile,
       outputPath: options.outputPath,
       cookiePath: options.cookieString,
+      doWorkshopDownload: !options.noWorkshop,
+      doWiringDownload: !options.noWiring,
+      doParamsValidation: !options.noParamsValidation,
+      doCookieTest: !options.noCookieTest,
       saveHTML: !!options.saveHTML,
       ignoreSaveErrors: !!options.ignoreSaveErrors,
     };

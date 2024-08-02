@@ -1,4 +1,4 @@
-import client from "./client";
+import client from "../client";
 import { stringify } from "qs";
 import { FetchManualPageParams } from "./fetchManualPage";
 import { JSDOM } from "jsdom";
@@ -13,7 +13,7 @@ export default async function fetchTreeAndCover(
 ): Promise<{ tableOfContents: any; pageHTML: string }> {
   const req = await client({
     method: "POST",
-    url: `https://www.fordservicecontent.com/Ford_Content/PublicationRuntimeRefreshPTS//publication/prod_1_3_362022/TreeAndCover/workshop/${params.category}/~WS8B/${params.vechicleId}`,
+    url: `https://www.fordservicecontent.com/Ford_Content/PublicationRuntimeRefreshPTS//publication/prod_1_3_362022/TreeAndCover/workshop/${params.category}/~WS8B/${params.vehicleId}`,
     params: {
       bookTitle: params.bookTitle,
       WiringBookTitle: params.WiringBookTitle,

@@ -1,6 +1,6 @@
 {
   "workshop": {
-    "vechicleId": "123",
+    "vehicleId": "123",
     "modelYear": "0000",
     "channel": "9",
     "book": "S0X",
@@ -9,7 +9,7 @@
     "WiringBookTitle": "0000 CarType",
     "booktype": "ody",
 
-    "country": "USA",
+    "country": "",
     "language": "EN-US",
     "contentmarket": "US",
     "contentlanguage": "EN",
@@ -20,8 +20,9 @@
     "marketGroup": "NA"
   },
   "wiring": {
-    "environment": "prod_1_3_372022",
-    "bookType": "svg"
+    "environment": "",
+    "bookType": "svg",
+    "languageCode": "ENUSA"
   },
   "pre_2003": {
     "alphabeticalIndexURL": "https://www.fordservicecontent.com/pubs/content/....."

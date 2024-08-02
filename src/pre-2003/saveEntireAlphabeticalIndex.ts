@@ -1,9 +1,9 @@
-import { Pre2003AlphabeticalIndex } from "./fetchAlphabeticalIndex";
 import { Page } from "playwright";
-import { SaveOptions } from "../saveEntireManual";
 import { join, resolve } from "path";
 import { fileExists, sanitizeName } from "../utils";
 import { writeFile } from "fs/promises";
+import type { Pre2003AlphabeticalIndex } from "./fetchAlphabeticalIndex";
+import type { SaveOptions } from "../workshop/saveEntireManual";
 
 export default async function saveEntirePre2003AlphabeticalIndex(
   outputPath: string,
