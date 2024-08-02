@@ -7,12 +7,7 @@ import fetchTableOfContents, {
 } from "./wiring/fetchTableOfContents";
 import saveEntireWiring from "./wiring/saveEntireWiring";
 import transformCookieString from "./transformCookieString";
-import {
-  chromium,
-  Page,
-  BrowserContextOptions,
-  BrowserContext,
-} from "playwright";
+import { chromium, Page, BrowserContext } from "playwright";
 import { join } from "path";
 import saveEntireManual from "./workshop/saveEntireManual";
 import readConfig, { Config } from "./readConfig";
@@ -80,6 +75,10 @@ async function run({
         // HOWEVER, these headers are only used for direct requests from `page.goto()`.
         // This means that they are NOT used when the browser is redirected.
         "sec-ch-ua": SEC_CH_UA,
+        // TODO: Playwright bug: accept-language header not set in headless mode
+        "accept-language": `${config.workshop.contentlanguage.toLowerCase()}-${
+          config.workshop.contentmarket
+        },${config.workshop.contentlanguage.toLowerCase()};q=0.9`,
       },
     });
 
