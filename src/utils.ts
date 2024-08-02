@@ -21,10 +21,12 @@ export async function fileExists(path: string): Promise<boolean> {
 
 // Emdashes (\u2013) are included as they are multi-byte and throw off length
 // calculations where 1 character is expected to be 1 byte.
-const nameRegex =
-  osType() === "Windows_NT" ? /[<>:"\\/|?*\0\u2013]/g : /[\\/\0\u2013]/g;
+const dashReplaceRegex =
+  osType() === "Windows_NT" ? /[<>:"\\/|?*\0\u2013]/gm : /[\\/\0\u2013]/gm;
+// Characters to remove. Mostly newlines and tabs.
+const removeRegex = /[$\r\n\f\v]/gm;
 export const sanitizeName = (name: string): string =>
-  name.replace(nameRegex, "-");
+  name.replace(dashReplaceRegex, "-").replace(removeRegex, "");
 
 export default function saveStream(stream: any, path: string): Promise<void> {
   return new Promise<void>((resolve, reject) => {
