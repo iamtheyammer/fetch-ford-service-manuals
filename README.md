@@ -97,31 +97,24 @@ This script requires some data about your car that's not available in the PTS GU
 
 ### **All Vehicles:** Get wiring data
 
-1. Create a copy of `cookieString.txt.template` called `cookieString.txt` if you haven't already.
-2. Clear the DevTools Network pane (click on the trash can or circle with a line through it)
-3. Go to the Workshop tab in PTS.
-4. Filter for the one POST to `https://www.fordservicecontent.com/Ford_Content/PublicationRuntimeRefreshPTS//publication/prod_1_3_{datecode}/TreeAndCover/workshop/32/~WSLL/{some numbers here}`.
-5. Go to the request headers and find the "Cookie:" entry.
-6. Open your `cookieString.txt` file, clear the contents, and copy these cookies into the file. Add a semi-colon and space at the end of the file because we will be adding more cookies in a later step.
-   - Do **not** include the name (`cookieString.txt` should **not** include `Cookie:`, for example.)
-   - NOTE: In Firefox, you MUST enable the *Raw* toggle at the top right of Response Headers, then copy it from there. If you don't, you'll get an invalid character error when trying to fetch wiring diagrams.
-7. Click the Wiring tab at the top of PTS.
-8. Filter for the GET request to this URL: `https://www.fordservicecontent.com/Ford_Content/PublicationRuntimeRefreshPTS//wiring/TableofContent` (there are query params at the end, that's ok). It should look similar to the request in [this photo](img/wiring-request.png).
+1. Clear the DevTools Network pane (click on the trash can or circle with a line through it)
+2. Click the Wiring tab at the top of PTS.
+3. Filter for the GET request to this URL: `https://www.fordservicecontent.com/Ford_Content/PublicationRuntimeRefreshPTS//wiring/TableofContent` (there are query params at the end, that's ok). It should look similar to the request in [this photo](img/wiring-request.png).
    - Make sure that "Content" in the url is SINGULAR: `TableOfContent`, not `TableOfContent`**`s`**
-9. Copy the `environment`,`bookType`, and `languageCode` query params into `.wiring` in `params.json`.
-   - If `WiringBookTitle` or `WiringBookCode` are still missing, you may need to select you may need to select a wiring manual. After selecing a manual, you'll find these in another request to `https://www.fordtechservice.dealerconnection.com/wiring/TableOfContents` (with some query params at the end):
+4. Copy the `environment`,`bookType`, and `languageCode` query params into `.wiring` in `params.json`.
+   - If `WiringBookTitle` or `WiringBookCode` are still missing, you may need to select you may need to select a wiring manual. After selecting a manual, you'll find these in another request to `https://www.fordtechservice.dealerconnection.com/wiring/TableOfContents` (with some query params at the end):
    - `booktitle` → `WiringBookTitle`
    - `book` → `WiringBookCode`
    - Use these two requests to fill in `params.json` as best as you can.
-10. Save `params.json`.
-11. Filter for the GET request to this URL: `https://www.fordtechservice.dealerconnection.com/wiring/TableOfContents` (there are query params at the end, that's ok).
-    - Unlike last time, make sure "Contents" in the url is PLURAL: `TableOfContent`**`s`**, not `TableOfContent`
-12. Go to the request headers and find the "Cookie:" entry.
-13. Copy the cookies from this request and add them `cookieString.txt` file.
-    - Do **not** include the name (`cookieString.txt` should **not** include `Cookie:`, for example.)
-    - Order does not matter: you can paste at the beginning or end of the file, but make sure that there is a semi-colon and space (`; `) after the first paste and before the second.
-    - NOTE: In Firefox, you MUST enable the *Raw* toggle at the top right of Response Headers, then copy it from there. If you don't, you'll get an invalid character error when trying to fetch wiring diagrams.
-14. Save `cookieString.txt`.
+5. Save `params.json`.
+6. Create a copy of `cookieString.txt.template` called `cookieString.txt` if you haven't already.
+7. Filter for the GET request to this URL: `https://www.fordtechservice.dealerconnection.com/wiring/TableOfContents` (there are query params at the end, that's ok).
+   - Unlike last time, make sure "Contents" in the url is PLURAL: `TableOfContent`**`s`**, not `TableOfContent`
+8. Go to the request headers and find the "Cookie:" entry.
+9. Copy the cookies from this request (triple-click to select all) and paste into the `cookieString.txt` file.
+   - Do **not** include the name of the header (`cookieString.txt` should **not** include `Cookie:`, for example.)
+   - NOTE: In Firefox, you MUST enable the *Raw* toggle at the top right of Response Headers, then copy it from there. If you don't, you'll get an invalid character error when trying to fetch wiring diagrams.
+10. Save `cookieString.txt`.
 
 ### Download the manual!
 
