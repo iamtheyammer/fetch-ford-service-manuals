@@ -83,7 +83,7 @@ export default function transformCookieString(cookieString: string): {
 
     // One for each domain
     cookiesDealerConnection.push(cookie);
-    cookiesFordServiceContent.push(cookie, {
+    cookiesFordServiceContent.push({
       ...cookie,
       domain: FORDSERVICECONTENT_COM,
     });
