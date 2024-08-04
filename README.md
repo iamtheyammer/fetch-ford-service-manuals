@@ -209,7 +209,7 @@ If you're having issues, try [re-collecting your cookies](#how-do-i-re-collect-m
 
 This can either mean that your cookies are invalid or that Ford (actually Akamai) has detected we're using a headless browser (Playwright).
 
-First, try [re-collecting your cookies](#how-do-i-re-collect-my-cookies) and trying again. If you still have issues, open a GitHub issue.
+First, try [re-collecting your cookies](#how-do-i-re-collect-my-cookies) and trying again. If you still have issues, [reach out](#can-i-get-helpsupport).
 
 ### `ERR_BAD_RESPONSE`
 
