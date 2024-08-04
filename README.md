@@ -46,11 +46,11 @@ WSL is a way to run Linux (Ubuntu is recommended for this project) in tandem wit
 
 These instructions are intended for Chrome or Chrome-based browsers.
 
-1. If you haven't, purchase a PTS subscription from [here](https://www.motorcraftservice.com/Purchase/ViewProduct). The 72 hour subscription is fine.
+1. If you haven't, purchase a PTS subscription from [here](https://www.motorcraftservice.com/Purchase/ViewProduct). The 72-hour subscription is fine.
 2. Once purchased, go to PTS: click [here](https://www.motorcraftservice.com/MySubscriptions), then click on your subscription title. ![how to open PTS](img/open-pts.png)
 3. Once PTS opens, navigate to your car.
-   - **Do not use your VIN.**
    - On the left, choose *By Year & Model*, then select your car's year and model.
+     - In some countries, *By Year & Model* may not be available. In that case, choose *By VIN* and enter your VIN.
    - Press GO once selected.
 
 ### Set up template files
@@ -242,9 +242,9 @@ To re-collect cookies, follow the instructions in [this](#all-vehicles-get-wirin
 
 If you're still having trouble, [reach out](#can-i-get-helpsupport).
 
-### Is this US- or English-only?
+### Will this work in my country/region?
 
-No! We've had success all across North America, South America, and Europe.
+Probably! We've had success all across North America, South America, Europe, and Australia.
 
 While the script is in English (meaning all messages that print out will be in English), it will download manuals in the language specified in `params.json`. Note that Ford must have the manual available in the requested language.
 
@@ -260,7 +260,7 @@ If this project was helpful to you, you can support this project on GitHub spons
 Contributions via pull requests are also more than welcomed. For the highest chance of getting your PR
 merged, please:
 
-- If adding new functionality, consider opening an issue first
+- If adding new functionality, consider opening an issue/discussing it on Discord first
 - Keep everything typed - this project is 100% TypeScript!
 - Keep using Yarn berry (no `node_modules` folder)
 - Format your code with `yarn format` before submitting for an easy review
@@ -269,9 +269,9 @@ These are not requirements-- I can always help you with these things-- but they 
 
 ### Can I get help/support?
 
-I'm generally happy to help, but I am a full-time university studdent and this is a pure passion project. I also don't keep a PTS subscription on hand for testing (it's pretty expensive long-term!).
+I'm generally happy to help, but I am a full-time university student and this is a pure passion project. I also don't keep a PTS subscription on hand for testing (it's pretty expensive long-term!).
 
-For help, either open a GitHub issue or join the [Discord server](https://discord.gg/gpfUAsMCGV). To help with 99% of issues, I'll need the error you're getting, your `params.json` and `cookieString.txt` files. There's a method on the Discord server to send them privately.
+For help, either open a GitHub issue or join the [Discord server](https://discord.gg/gpfUAsMCGV). To help with 99% of issues, I'll need the error you're getting along with your `params.json` and `cookieString.txt` files. There's a method on the Discord server to send them privately.
 
 ### Why did you make this?
 
