@@ -67,7 +67,7 @@ export default async function saveEntireWiring(
     };
 
     if (isPage(doc) || isBasicPage(doc)) {
-      await savePage(wiringFetchParams, doc, browserPage, sectionPath);
+      // await savePage(wiringFetchParams, doc, browserPage, sectionPath);
     } else if (isConnectors(doc)) {
       await saveConnector(wiringFetchParams, doc, browserPage, connectorPath);
     } else if (isLocIndex(doc)) {
