@@ -29,7 +29,7 @@ export default async function saveEntirePre2003AlphabeticalIndex(
 
     console.log(`Saving ${title}...`);
     try {
-      await browserPage.goto("https://www.fordservicecontent.com" + href, {
+      await browserPage.goto("https://www.fordservicecontent.dealerconnection.com" + href, {
         waitUntil: "load",
       });
 
