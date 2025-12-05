@@ -25,4 +25,8 @@ const client = axios.create({
     : false,
 });
 
+export const setCookies = (cookies: string) => {
+  client.defaults.headers.common["Cookie"] = cookies;
+};
+
 export default client;

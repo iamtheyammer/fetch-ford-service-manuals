@@ -122,6 +122,25 @@ Make sure that the directory for the downloaded manual is empty-- it'll have lot
 
 You can get more param information by running `yarn start --help`. Notably, `--saveHTML` will save `.html` files along with the `.pdf` files downloaded by default, and `--ignoreSaveErrors` will continue downloading manuals if an error is encountered, skipping the file with an error.
 
+### Browser modes: managed vs. remote
+
+By default the script runs in **managed** mode, where Playwright launches its own Chromium instance, injects the cookies from `cookieString.txt`, and applies the usual anti-detection tweaks. This is the simplest mode—just provide the cookie file and let the tool drive everything from a fresh browser profile.
+
+Some users have run into `ERR_HTTP2_PROTOCOL_ERROR` or similar errors caused by Ford/Akamai detecting headless automation. The new **remote** mode mitigates that by connecting to a Chrome window you already control. Because the session is human-driven (normal extensions, fonts, history, etc.), it tends to be stealthier and far less likely to trigger headless-detection heuristics. Another bonus: you no longer have to paste cookies into `cookieString.txt`; the downloader simply reuses whatever cookies already exist in that browser profile after you sign into PTS.
+
+| Mode    | How it works | When to use |
+|---------|--------------|-------------|
+| `managed` (default) | Playwright launches Chromium, injects cookies from `cookieString.txt`, applies some stealth tweaks. | Want to be headless |
+| `remote` | Playwright attaches to your existing Chrome via the DevTools Protocol and clones the cookies already stored there. | Great when you keep hitting `ERR_HTTP2_PROTOCOL_ERROR`, or you prefer logging in manually once and letting the tool reuse that live session. |
+
+### Using remote browser mode
+
+1. Start Chrome (or another Chromium-based browser) with remote debugging enabled. For example on Windows:<br>`"C:\Program Files\Google\Chrome\Application\chrome.exe" --remote-debugging-port=9222 --user-data-dir="C:\temp\chrome-debug"`
+1. In that new browser window, visit [motorcraftservice.com](https://www.motorcraftservice.com), sign into your account, and navigate into PTS just like you normally would until the Workshop tab loads. This ensures Ford’s cookies are stored in that profile.
+1. Setup the `params.json` file for your vehicle. See above.
+1. Run the downloader with `--browserMode remote`. You can keep the `-s` argument pointing to your cookie file for legacy reasons, but it is ignored once remote mode is active because cookies are pulled directly from Chrome. Example command:<br>`yarn start --browserMode remote -c .\templates\params.json -s -o /directory/where/you/want/the/downloaded/manual/`
+1. Leave Chrome open while the downloader runs. When it finishes, your Chrome stays open and logged in, ready for another run without needing to collect cookies again.
+
 It can take a little while! On a fast computer with a fast internet connection, and, more importantly, a fast disk drive, over 15 minutes to download the manuals for the 2005 Taurus. Be patient!
 
 Also, the resulting folder is pretty sizeable. The folder for the 2005 Taurus was about 300mb, and the F150 folder was a couple gigabytes.

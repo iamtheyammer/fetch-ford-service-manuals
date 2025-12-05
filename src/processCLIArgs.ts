@@ -11,6 +11,8 @@ export interface CLIArgs {
   doCookieTest: boolean;
   saveHTML: boolean;
   ignoreSaveErrors: boolean;
+  browserMode: "managed" | "remote";
+  remoteDebuggingUrl: string;
 }
 
 export default function processCLIArgs(): CLIArgs {
@@ -62,6 +64,15 @@ export default function processCLIArgs(): CLIArgs {
       default: false,
     },
     {
+      name: "browserMode",
+      type: String,
+      defaultValue: "managed",
+    },
+    {
+      name: "remoteDebuggingUrl",
+      type: String,
+    },
+    {
       name: "help",
       type: Boolean,
     },
@@ -85,7 +96,7 @@ export default function processCLIArgs(): CLIArgs {
           name: "cookieString -s",
           typeLabel: "{underline /path/to/cookieString.txt}",
           description:
-            "{bold Required.} Path to the file that contains your PTS Cookie Header.",
+            "{bold Required when using managed mode.} Path to the file that contains your PTS Cookie Header.",
         },
         {
           name: "outputPath -o",
@@ -127,6 +138,18 @@ export default function processCLIArgs(): CLIArgs {
             "Ignore errors and continue downloading the manual when there's an error saving or PDF-ing a page. Default: false.",
         },
         {
+          name: "browserMode",
+          typeLabel: "{underline managed|remote}",
+          description:
+            "Choose whether Codex starts its own browser (managed) or connects to your Chrome session (remote). Default: managed.",
+        },
+        {
+          name: "remoteDebuggingUrl",
+          typeLabel: "{underline http://127.0.0.1:9222}",
+          description:
+            "Remote debugging endpoint to connect to when browserMode is remote. Defaults to http://127.0.0.1:9222.",
+        },
+        {
           name: "help",
           typeLabel: " ",
           description: "Print this usage guide.",
@@ -144,12 +167,31 @@ export default function processCLIArgs(): CLIArgs {
       process.exit(0);
     }
 
-    if (!options.configFile || !options.outputPath || !options.cookieString) {
+    if (!options.configFile || !options.outputPath) {
       console.error("Missing required args!");
       // console.log(options);
       console.log(usage);
       process.exit(1);
     }
+
+    const requestedModeRaw =
+      typeof options.browserMode === "string"
+        ? options.browserMode.toLowerCase()
+        : "managed";
+    if (requestedModeRaw !== "managed" && requestedModeRaw !== "remote") {
+      console.error(
+        `Unsupported browserMode "${options.browserMode}". Use "managed" or "remote".`
+      );
+      process.exit(1);
+    }
+    const browserMode = requestedModeRaw as "managed" | "remote";
+
+    if (browserMode === "managed" && !options.cookieString) {
+      console.error("cookieString is required when using managed mode!");
+      console.log(usage);
+      process.exit(1);
+    }
+
     return {
       configPath: options.configFile,
       outputPath: options.outputPath,
@@ -160,6 +202,8 @@ export default function processCLIArgs(): CLIArgs {
       doCookieTest: !options.noCookieTest,
       saveHTML: !!options.saveHTML,
       ignoreSaveErrors: !!options.ignoreSaveErrors,
+      browserMode,
+      remoteDebuggingUrl: options.remoteDebuggingUrl || "http://127.0.0.1:9222",
     };
   } catch (e: any) {
     console.error(e);

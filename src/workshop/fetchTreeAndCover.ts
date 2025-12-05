@@ -6,14 +6,21 @@ import { JSDOM } from "jsdom";
 export interface FetchTreeAndCoverParams extends FetchManualPageParams {
   CategoryDescription: string;
   category: string;
+  environment?: string;
 }
 
 export default async function fetchTreeAndCover(
   params: FetchTreeAndCoverParams
 ): Promise<{ tableOfContents: any; pageHTML: string }> {
+  const _params = {
+    ...params,
+  };
+  // Only used in the path (not in query string)
+  delete _params.environment;
+
   const req = await client({
     method: "POST",
-    url: `https://www.fordservicecontent.com/Ford_Content/PublicationRuntimeRefreshPTS//publication/prod_1_3_362022/TreeAndCover/workshop/${params.category}/~WS8B/${params.vehicleId}`,
+    url: `https://www.fordservicecontent.com/Ford_Content/PublicationRuntimeRefreshPTS//publication/${params.environment}/TreeAndCover/workshop/${params.category}/~WSMX/${params.vehicleId}`,
     params: {
       bookTitle: params.bookTitle,
       WiringBookTitle: params.WiringBookTitle,
