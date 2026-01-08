@@ -11,6 +11,8 @@ export interface CLIArgs {
   doCookieTest: boolean;
   saveHTML: boolean;
   ignoreSaveErrors: boolean;
+  expandInteractive: boolean;
+  followDiagnosticLinks: boolean;
 }
 
 export default function processCLIArgs(): CLIArgs {
@@ -58,6 +60,16 @@ export default function processCLIArgs(): CLIArgs {
     {
       name: "ignoreSaveErrors",
       alias: "i",
+      type: Boolean,
+      default: false,
+    },
+    {
+      name: "expandInteractive",
+      type: Boolean,
+      default: false,
+    },
+    {
+      name: "followDiagnosticLinks",
       type: Boolean,
       default: false,
     },
@@ -127,6 +139,18 @@ export default function processCLIArgs(): CLIArgs {
             "Ignore errors and continue downloading the manual when there's an error saving or PDF-ing a page. Default: false.",
         },
         {
+          name: "expandInteractive",
+          typeLabel: " ",
+          description:
+            "Expand interactive elements (like 'Click for details' sections) before generating PDFs. Increases download time but captures hidden diagnostic content. Default: false.",
+        },
+        {
+          name: "followDiagnosticLinks",
+          typeLabel: " ",
+          description:
+            "Follow and download linked diagnostic/pinpoint test procedures from DTC charts and diagnostic pages. Significantly increases download time and page count. Default: false.",
+        },
+        {
           name: "help",
           typeLabel: " ",
           description: "Print this usage guide.",
@@ -160,6 +184,8 @@ export default function processCLIArgs(): CLIArgs {
       doCookieTest: !options.noCookieTest,
       saveHTML: !!options.saveHTML,
       ignoreSaveErrors: !!options.ignoreSaveErrors,
+      expandInteractive: !!options.expandInteractive,
+      followDiagnosticLinks: !!options.followDiagnosticLinks,
     };
   } catch (e: any) {
     console.error(e);

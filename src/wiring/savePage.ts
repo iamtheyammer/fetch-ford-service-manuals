@@ -1,5 +1,7 @@
 import { Page } from "playwright";
 import { JSDOM } from "jsdom";
+import { existsSync } from "fs";
+import { pathToFileURL } from "url";
 import fetchPageList from "./fetchPageList";
 import {
   WiringFetchParams,
@@ -40,16 +42,27 @@ export default async function savePage(
   );
 
   for (const subPage of pageList) {
-    console.log(`Saving page ${subPage} of ${doc.Title}...`);
-
     if (typeof subPage !== "string") {
       // page is a BasicPagePageListItem, download PDF
       const pdfPath = join(folderPath, `${subPage.Text}.pdf`);
 
+      // Check if PDF already exists (resume capability)
+      if (existsSync(pdfPath)) {
+        console.log(
+          `Skipping page ${subPage.Text} of ${doc.Title} (already exists)...`
+        );
+        continue;
+      }
+
+      console.log(`Saving page ${subPage} of ${doc.Title}...`);
       await fetchBasicPage(pdfPath, params.book);
       continue;
     }
 
+    // Build title first to check if PDF exists
+    let title = subPage;
+
+    // We need to fetch at least enough to get the title for checking
     const svg = await fetchSvg(
       doc.Number,
       subPage,
@@ -69,10 +82,6 @@ export default async function savePage(
       continue;
     }
 
-    svgElement.setAttribute("xmlns", "http://www.w3.org/2000/svg");
-
-    let title = subPage;
-
     const headerElement = dom.window.document.getElementById("Header");
     if (headerElement) {
       const child = headerElement.firstElementChild;
@@ -81,6 +90,20 @@ export default async function savePage(
       }
     }
 
+    const pdfPath = join(folderPath, `${title}.pdf`);
+
+    // Check if PDF already exists (resume capability)
+    if (existsSync(pdfPath)) {
+      console.log(
+        `Skipping page ${subPage} of ${doc.Title} (already exists)...`
+      );
+      continue;
+    }
+
+    console.log(`Saving page ${subPage} of ${doc.Title}...`);
+
+    svgElement.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+
     const svgString = dom.serialize();
 
     // Save the SVG
@@ -88,10 +111,10 @@ export default async function savePage(
     await writeFile(svgPath, svgString);
 
     // Print as PDF
-    const pdfPath = join(folderPath, `${title}.pdf`);
-
     // can't use getSvgUrl here because the SVG is too big
-    await browserPage.goto(`file:///${resolve(svgPath)}`);
+    // Use pathToFileURL to properly handle special characters like # in filenames
+    const fileUrl = pathToFileURL(resolve(svgPath)).href;
+    await browserPage.goto(fileUrl);
     await browserPage.pdf({
       path: pdfPath,
       landscape: true,
