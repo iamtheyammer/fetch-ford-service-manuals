@@ -19,7 +19,8 @@ export default async function saveEntireWiring(
   fetchManualParams: FetchManualPageParams,
   fetchWiringParams: WiringFetchParams,
   toc: WiringTableOfContentsEntry[],
-  browserPage: Page
+  browserPage: Page,
+  ignoreSaveErrors: boolean = false
 ) {
   const wiringPath = join(path, "Wiring");
   try {
@@ -66,14 +67,24 @@ export default async function saveEntireWiring(
       country: fetchManualParams.country,
     };
 
-    if (isPage(doc) || isBasicPage(doc)) {
-      await savePage(wiringFetchParams, doc, browserPage, sectionPath);
-    } else if (isConnectors(doc)) {
-      await saveConnector(wiringFetchParams, doc, browserPage, connectorPath);
-    } else if (isLocIndex(doc)) {
-      await saveLocIndex(wiringFetchParams, doc, connectorPath);
-    } else {
-      console.error(`Unrecognized wiring page type ${doc.Type}`, doc);
+    try {
+      if (isPage(doc) || isBasicPage(doc)) {
+        await savePage(wiringFetchParams, doc, browserPage, sectionPath, ignoreSaveErrors);
+      } else if (isConnectors(doc)) {
+        await saveConnector(wiringFetchParams, doc, browserPage, connectorPath);
+      } else if (isLocIndex(doc)) {
+        await saveLocIndex(wiringFetchParams, doc, connectorPath);
+      } else {
+        console.error(`Unrecognized wiring page type ${doc.Type}`, doc);
+      }
+    } catch (e: any) {
+      if (ignoreSaveErrors) {
+        console.error(
+          `Skipping ${doc.Title} (${doc.Type}) due to error: ${e.message}`
+        );
+      } else {
+        throw e;
+      }
     }
   }
 }

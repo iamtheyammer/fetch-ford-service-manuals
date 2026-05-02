@@ -194,7 +194,8 @@ async function run({
       config.workshop,
       wiringParams,
       wiringToC,
-      wiringPage
+      wiringPage,
+      restArgs.ignoreSaveErrors
     );
   } else {
     console.log("Skipping wiring manual download.");
