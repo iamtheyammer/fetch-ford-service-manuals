@@ -828,7 +828,7 @@ __metadata:
     command-line-args: "npm:^5.2.1"
     command-line-usage: "npm:^6.1.1"
     jsdom: "npm:^19.0.0"
-    playwright: "npm:^1.42.1"
+    playwright: "npm:^1.55.0"
     prettier: "npm:^2.5.1"
     qs: "npm:^6.10.3"
     svg-to-img: "npm:^2.0.9"
@@ -1546,27 +1546,27 @@ __metadata:
   languageName: node
   linkType: hard
 
-"playwright-core@npm:1.44.1":
-  version: 1.44.1
-  resolution: "playwright-core@npm:1.44.1"
+"playwright-core@npm:1.60.0":
+  version: 1.60.0
+  resolution: "playwright-core@npm:1.60.0"
   bin:
     playwright-core: cli.js
-  checksum: 10/f79f9022bbb760daed371e36c802b27d43dc75e67de4d139d83b47feea51c8b884f3296cce85c3afa71c942290cef1b4369cd9ddf4dda5457a0a81772c73b50a
+  checksum: 10/66c0f83d627e673261c848dd6fe1f2856d5b5b6859268acb61a45c00f5bf926e596a351a9c481a3a4e82a45022c7c6b5d99ebc3906fc6876ac582ed6f7e16190
   languageName: node
   linkType: hard
 
-"playwright@npm:^1.42.1":
-  version: 1.44.1
-  resolution: "playwright@npm:1.44.1"
+"playwright@npm:^1.55.0":
+  version: 1.60.0
+  resolution: "playwright@npm:1.60.0"
   dependencies:
     fsevents: "npm:2.3.2"
-    playwright-core: "npm:1.44.1"
+    playwright-core: "npm:1.60.0"
   dependenciesMeta:
     fsevents:
       optional: true
   bin:
     playwright: cli.js
-  checksum: 10/3207178a78f1c971dddf99c9a08052e462c882092e0d47e3dd8287ced40897a49e387e545a61d31e5d68f7e443d7818660aa12ce43ab662d01d95bcfcfeca2ca
+  checksum: 10/8569770637ee35d08cca3b53a5b56c21e9236bd1ac4718456d5988fb8acd51c5b3cc2cf90748363a36199529e870a9b6c68d6fc9e19571261cd867005d6331c1
   languageName: node
   linkType: hard
 

@@ -19,7 +19,7 @@
     "command-line-args": "^5.2.1",
     "command-line-usage": "^6.1.1",
     "jsdom": "^19.0.0",
-    "playwright": "^1.42.1",
+    "playwright": "^1.55.0",
     "qs": "^6.10.3",
     "svg-to-img": "^2.0.9"
   },
@@ -27,6 +27,6 @@
     "start": "ts-node src/index.ts",
     "inspect": "yarn node --inspect-brk -r ts-node/register src/index.ts",
     "format": "prettier --write src/**/*.ts",
-    "playwright-setup": "playwright install chromium && playwright install-deps chromium"
+    "playwright-setup": "playwright install --with-deps chromium"
   }
 }
