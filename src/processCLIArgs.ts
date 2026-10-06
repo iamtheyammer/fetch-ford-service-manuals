@@ -11,6 +11,9 @@ export interface CLIArgs {
   doCookieTest: boolean;
   saveHTML: boolean;
   ignoreSaveErrors: boolean;
+  expandPinpoints: boolean;
+  onlyPath?: string;
+  skipExisting: boolean;
 }
 
 export default function processCLIArgs(): CLIArgs {
@@ -58,6 +61,20 @@ export default function processCLIArgs(): CLIArgs {
     {
       name: "ignoreSaveErrors",
       alias: "i",
+      type: Boolean,
+      default: false,
+    },
+    {
+      name: "expandPinpoints",
+      type: Boolean,
+      default: false,
+    },
+    {
+      name: "onlyPath",
+      type: String,
+    },
+    {
+      name: "skipExisting",
       type: Boolean,
       default: false,
     },
@@ -127,6 +144,24 @@ export default function processCLIArgs(): CLIArgs {
             "Ignore errors and continue downloading the manual when there's an error saving or PDF-ing a page. Default: false.",
         },
         {
+          name: "expandPinpoints",
+          typeLabel: " ",
+          description:
+            "Un-hide collapsed pinpoint test sections (and their steps and 'click for details' text) in workshop pages before saving the PDF. Default: false.",
+        },
+        {
+          name: "onlyPath",
+          typeLabel: "{underline text}",
+          description:
+            "Only save workshop documents whose output path contains this text, e.g. \"Diagnosis and Testing\". Folders are created only when a document is saved.",
+        },
+        {
+          name: "skipExisting",
+          typeLabel: " ",
+          description:
+            "Skip workshop documents whose PDF already exists in the output folder (resume an interrupted download). Default: false.",
+        },
+        {
           name: "help",
           typeLabel: " ",
           description: "Print this usage guide.",
@@ -160,6 +195,9 @@ export default function processCLIArgs(): CLIArgs {
       doCookieTest: !options.noCookieTest,
       saveHTML: !!options.saveHTML,
       ignoreSaveErrors: !!options.ignoreSaveErrors,
+      expandPinpoints: !!options.expandPinpoints,
+      onlyPath: options.onlyPath,
+      skipExisting: !!options.skipExisting,
     };
   } catch (e: any) {
     console.error(e);

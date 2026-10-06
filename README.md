@@ -122,6 +122,19 @@ Make sure that the directory for the downloaded manual is empty-- it'll have lot
 
 You can get more param information by running `yarn start --help`. Notably, `--saveHTML` will save `.html` files along with the `.pdf` files downloaded by default, and `--ignoreSaveErrors` will continue downloading manuals if an error is encountered, skipping the file with an error.
 
+#### Pinpoint tests and partial re-downloads
+
+By default, diagnostic pages are saved with their pinpoint tests collapsed (headings only). Add `--expandPinpoints` to save the full test steps: in-page tests are un-hidden, and shared ("SPA") pinpoint tests used on powertrain pages are fetched and inserted under their headings.
+
+- `--onlyPath "Diagnosis and Testing"` saves only documents whose output path contains that text. Use this to re-fetch just the diagnostic pages of a manual you've already downloaded.
+- `--skipExisting` skips documents whose PDF already exists, so an interrupted download can be resumed.
+
+Example (re-fetch only diagnostic pages, with pinpoint tests, into a new folder):
+
+```
+yarn start -c templates/params.json -s templates/cookieString.txt -o ./diag-refetch --noWiring --expandPinpoints --onlyPath "Diagnosis and Testing"
+```
+
 It can take a little while! On a fast computer with a fast internet connection, and, more importantly, a fast disk drive, over 15 minutes to download the manuals for the 2005 Taurus. Be patient!
 
 Also, the resulting folder is pretty sizeable. The folder for the 2005 Taurus was about 300mb, and the F150 folder was a couple gigabytes.

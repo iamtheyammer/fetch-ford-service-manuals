@@ -19,6 +19,11 @@ export interface FetchManualPageParams {
   marketGroup: string;
   WiringBookCode: string;
   WiringBookTitle: string;
+  // Shared ("SPA") pinpoint tests: searchNumber = "<spapptfile>_spappt",
+  // procUid = the docID of the page that embeds the test.
+  procUid?: string;
+  diagTool?: string;
+  category?: string;
 }
 
 export default async function fetchManualPage(

@@ -7,6 +7,7 @@ import {
 } from "./fetchTableOfContents";
 import fetchSvg from "./fetchSvg";
 import { join, resolve } from "path";
+import { pathToFileURL } from "url";
 import { writeFile } from "fs/promises";
 import { sanitizeName } from "../utils";
 import fetchBasicPage from "./fetchBasicPage";
@@ -39,7 +40,12 @@ export default async function savePage(
     JSON.stringify(pageList, null, 2)
   );
 
-  for (const subPage of pageList) {
+  for (let subPage of pageList as any[]) {
+    // Newer PTS responses return { cell, page, ... } objects instead of strings
+    if (subPage && typeof subPage === "object" && "page" in subPage) {
+      subPage = String(subPage.page);
+    }
+
     console.log(`Saving page ${subPage} of ${doc.Title}...`);
 
     if (typeof subPage !== "string") {
@@ -91,7 +97,7 @@ export default async function savePage(
     const pdfPath = join(folderPath, `${title}.pdf`);
 
     // can't use getSvgUrl here because the SVG is too big
-    await browserPage.goto(`file:///${resolve(svgPath)}`);
+    await browserPage.goto(pathToFileURL(resolve(svgPath)).href);
     await browserPage.pdf({
       path: pdfPath,
       landscape: true,
